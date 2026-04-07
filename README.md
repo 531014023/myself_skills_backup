@@ -8,3 +8,5 @@
 |personal-rules|	全域双轨专家级回答框架|
 |personal-writing-style|	个人写作风格技能|
 |wechat-article-fetcher|	微信公众号文章抓取备份|
+|buffett-perspective|	沃伦·巴菲特的思维框架与表达方式，可直接对话|
+|munger-perspective|	芒格的思维框架与表达方式，可直接对话|
