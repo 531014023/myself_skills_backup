@@ -10,3 +10,4 @@
 |wechat-article-fetcher|	微信公众号文章抓取备份|
 |buffett-perspective|	沃伦·巴菲特的思维框架与表达方式，可直接对话|
 |munger-perspective|	芒格的思维框架与表达方式，可直接对话|
+|tang-chao-perspective|	唐书房作者唐朝的思维框架与表达方式，可直接对话|
