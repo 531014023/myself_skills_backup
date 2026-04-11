@@ -1,0 +1,108 @@
+.calibre {
+  display: block;
+  font-size: 1em;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0 5pt;
+}
+
+.calibre1 {
+  height: auto;
+  width: auto;
+}
+
+.calibre2 {
+  display: block;
+}
+
+.calibre3 {
+  color: gray;
+  display: block;
+  height: 2px;
+  margin: 0.5em auto;
+  border: currentColor inset 1px;
+}
+
+.content {
+  display: block;
+  font-family: "汉仪旗黑 50S", "HYQiHei-50s", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+  text-align: justify;
+  text-indent: 2em;
+  margin: 1em 0;
+  font-weight: bold;
+}
+
+.contentcr {
+  display: block;
+  font-family: "汉仪旗黑 50S", "HYQiHei-50s", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+  text-align: center;
+  text-indent: 0;
+  margin: 1em 0;
+}
+
+.contentcr1 {
+  display: block;
+  font-family: "汉仪旗黑 50S", "HYQiHei-50s", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+  text-align: center;
+  text-indent: 0;
+  margin: 1em 0 2em;
+}
+
+.contentcr2 {
+  display: block;
+  font-family: "汉仪旗黑 50S", "HYQiHei-50s", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+  text-align: center;
+  text-indent: 0;
+  margin: 2em 0 1em;
+}
+
+.copyrighttitle {
+  display: block;
+  font-family: "汉仪旗黑 65S", "HY-QiHei65", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 1.2em;
+  text-align: center;
+  text-indent: 0;
+  margin: 0.67em 0 0.9em;
+}
+
+.firsttitle {
+  display: block;
+  font-family: "汉仪旗黑 65S", "HY-QiHei65", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 1.2em;
+  text-align: center;
+  text-indent: 0;
+  margin: 0.67em 0 0.9em;
+}
+
+.prerendercontent {
+  display: block;
+}
+
+.quotation {
+  color: brown;
+  display: block;
+  font-family: "汉仪楷体S", "ETrump KaiTi", "方正仿宋", "FZFSJW--GB1-0", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+  text-align: justify;
+  text-indent: 2em;
+  margin: 1em 0;
+}
+
+.secondtitle {
+  display: block;
+  font-family: "汉仪旗黑 65S", "HY-QiHei65", "PingFang SC", -apple-system, "SF UI Text", "Lucida Grande", STheiti, "Microsoft YaHei", sans-serif;
+  font-size: 1.41667em;
+  font-weight: bold;
+  line-height: 1.3em;
+  text-align: center;
+  text-indent: 0;
+  margin: 0.83em 0 0.7em;
+}
