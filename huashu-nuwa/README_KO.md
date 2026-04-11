@@ -177,7 +177,7 @@ Nuwa는 사람을 복제하지 않는다. 인지 운영체제를 추출한다.
 
 - WeChat 공식 계정: 花叔 (Huashu)
 - X: [@AlchainHust](https://x.com/AlchainHust)
-- Bilibili: [AI进化论-花生](https://space.bilibili.com/14097567)
+- Bilibili: [花叔](https://space.bilibili.com/14097567)
 - YouTube: [@Alchain](https://www.youtube.com/@Alchain)
 
 ## 라이선스

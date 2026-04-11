@@ -26,6 +26,10 @@
 
 [English](README_EN.md) · [日本語](README_JA.md) · [한국어](README_KO.md) · [Español](README_ES.md)
 
+<br>
+
+[![Star History Chart](https://api.star-history.com/svg?repos=alchaincyf/nuwa-skill&type=Date)](https://star-history.com/#alchaincyf/nuwa-skill&Date)
+
 </div>
 
 ---
@@ -123,7 +127,7 @@ npx skills add alchaincyf/nuwa-skill
 
 ## 女娲蒸馏了什么
 
-蒸馏各领域最强的人，需要提取比日常工作习惯更深的东西。女娲提取六层：
+蒸馏各领域最强的人，需要提取比日常工作习惯更深的东西。女娲提取五层：
 
 | 层次 | 说明 |
 |---|---|
@@ -205,17 +209,24 @@ nuwa-skill/
 ├── references/
 │   ├── extraction-framework.md   # 提炼方法论（想深入了解看这个）
 │   └── skill-template.md         # 生成Skill的模板
-└── examples/                     # 7个完整示例 + 调研数据
-    ├── steve-jobs-perspective/    # ⭐ 乔布斯（含实战对话记录）
-    ├── elon-musk-perspective/     # 马斯克
-    ├── naval-perspective/         # Naval Ravikant
-    ├── munger-perspective/        # 查理·芒格
-    ├── feynman-perspective/       # 费曼
-    ├── taleb-perspective/         # 塔勒布
-    └── zhangxuefeng-perspective/  # 张雪峰（中文人物示例）
+└── examples/                          # 13个人物 + 1个主题，含完整调研数据
+    ├── steve-jobs-perspective/        # ⭐ 乔布斯（含实战对话记录）
+    ├── paul-graham-perspective/       # Paul Graham
+    ├── zhang-yiming-perspective/      # 张一鸣
+    ├── andrej-karpathy-perspective/   # Karpathy
+    ├── ilya-sutskever-perspective/    # Ilya Sutskever
+    ├── trump-perspective/             # 特朗普
+    ├── mrbeast-perspective/           # MrBeast
+    ├── elon-musk-perspective/         # 马斯克
+    ├── munger-perspective/            # 查理·芒格
+    ├── feynman-perspective/           # 费曼
+    ├── naval-perspective/             # Naval Ravikant
+    ├── taleb-perspective/             # 塔勒布
+    ├── zhangxuefeng-perspective/      # 张雪峰
+    └── x-mastery-mentor/             # X导师（主题Skill）
 ```
 
-调研过程全透明。7个examples都包含完整的调研文件，你可以看到信息怎么被收集、筛选、变成心智模型。乔布斯的示例还附带了一段完整的实战对话记录（聊AI硬件、OpenAI vs Anthropic、Apple破局），展示Skill在多轮深度对话中的表现。
+调研过程全透明。每个example都包含完整的调研文件，你可以看到信息怎么被收集、筛选、变成心智模型。乔布斯的示例还附带了一段完整的实战对话记录（聊AI硬件、OpenAI vs Anthropic、Apple破局），展示Skill在多轮深度对话中的表现。
 
 ---
 
@@ -233,16 +244,6 @@ nuwa-skill/
 
 ---
 
-## Star History
-
-<div align="center">
-
-[![Star History Chart](https://api.star-history.com/svg?repos=alchaincyf/nuwa-skill&type=Date)](https://star-history.com/#alchaincyf/nuwa-skill&Date)
-
-</div>
-
----
-
 ## 关于作者
 
 **花叔 Huashu** — AI Native Coder，独立开发者，代表作：小猫补光灯（AppStore 付费榜 Top1）
@@ -251,9 +252,9 @@ nuwa-skill/
 |------|------|
 | 🌐 官网 | [bookai.top](https://bookai.top) · [huasheng.ai](https://www.huasheng.ai) |
 | 𝕏 Twitter | [@AlchainHust](https://x.com/AlchainHust) |
-| 📺 B站 | [AI进化论-花生](https://space.bilibili.com/14097567) |
+| 📺 B站 | [花叔](https://space.bilibili.com/14097567) |
 | ▶️ YouTube | [@Alchain](https://www.youtube.com/@Alchain) |
-| 📕 小红书 | [花生](https://www.xiaohongshu.com/user/profile/5abc6f17e8ac2b109179dfdf) |
+| 📕 小红书 | [花叔](https://www.xiaohongshu.com/user/profile/5abc6f17e8ac2b109179dfdf) |
 | 💬 公众号 | 微信搜「花叔」或扫码关注 ↓ |
 
 <img src="wechat-qrcode.jpg" alt="公众号二维码" width="360">
@@ -292,6 +293,6 @@ Not role-playing. Cognitive architecture extraction.
 
 **How it works**: Input a name → 6 parallel research agents → 40+ primary sources → triple-verified mental models → quality-validated SKILL.md
 
-**7 examples included**: Steve Jobs, Elon Musk, Naval Ravikant, Charlie Munger, Feynman, Taleb, and Zhang Xuefeng — all with full research data. The Jobs example includes a complete multi-turn conversation demo.
+**13 person skills + 1 topic skill included** — all with full research data. The Jobs example includes a complete multi-turn conversation demo.
 
 See the Chinese README above for live examples and methodology.

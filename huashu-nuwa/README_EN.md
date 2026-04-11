@@ -175,7 +175,7 @@ Huashu / Huasheng, AI Native Coder, indie developer. All products are built by A
 
 - WeChat Official Account: 花叔 (Huashu)
 - X: [@AlchainHust](https://x.com/AlchainHust)
-- Bilibili: [AI进化论-花生](https://space.bilibili.com/14097567)
+- Bilibili: [花叔](https://space.bilibili.com/14097567)
 - YouTube: [@Alchain](https://www.youtube.com/@Alchain)
 
 ## License
