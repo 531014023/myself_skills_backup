@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ncx version="2005-1" xml:lang="zho" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+  <head>
+    <meta content="0dcc4188-7a6a-4743-b99e-09159a21e478" name="dtb:uid"/>
+    <meta content="3" name="dtb:depth"/>
+    <meta content="calibre (3.42.0)" name="dtb:generator"/>
+    <meta content="0" name="dtb:totalPageCount"/>
+    <meta content="0" name="dtb:maxPageNumber"/>
+  </head>
+  <docTitle>
+    <text>段永平传</text>
+  </docTitle>
+  <navMap>
+    <navPoint class="chapter" id="chapter_2" playOrder="1">
+      <navLabel>
+        <text>版权信息</text>
+      </navLabel>
+      <content src="EPUB/chapter_2.xhtml"/>
+    </navPoint>
+    <navPoint class="chapter" id="chapter_3" playOrder="2">
+      <navLabel>
+        <text>前言</text>
+      </navLabel>
+      <content src="EPUB/chapter_3.xhtml"/>
+    </navPoint>
+    <navPoint class="chapter" id="sep_0" playOrder="3">
+      <navLabel>
+        <text>第一章 生活就是最好的历练</text>
+      </navLabel>
+      <content src="EPUB/chapter_4.xhtml"/>
+      <navPoint class="chapter" id="chapter_5" playOrder="4">
+        <navLabel>
+          <text>井冈山下的江西老表</text>
+        </navLabel>
+        <content src="EPUB/chapter_5.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_6" playOrder="5">
+        <navLabel>
+          <text>浙江大学的无线电才子</text>
+        </navLabel>
+        <content src="EPUB/chapter_6.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_7" playOrder="6">
+        <navLabel>
+          <text>放弃“铁饭碗”，继续深造</text>
+        </navLabel>
+        <content src="EPUB/chapter_7.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_8" playOrder="7">
+        <navLabel>
+          <text>拒绝北漂，一切往南看</text>
+        </navLabel>
+        <content src="EPUB/chapter_8.xhtml"/>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="sep_1" playOrder="8">
+      <navLabel>
+        <text>第二章 理想主义者的成功和失败</text>
+      </navLabel>
+      <content src="EPUB/chapter_9.xhtml"/>
+      <navPoint class="chapter" id="chapter_10" playOrder="9">
+        <navLabel>
+          <text>初生牛犊不怕虎的厂长</text>
+        </navLabel>
+        <content src="EPUB/chapter_10.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_11" playOrder="10">
+        <navLabel>
+          <text>扭亏为盈，崭露头角</text>
+        </navLabel>
+        <content src="EPUB/chapter_11.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_12" playOrder="11">
+        <navLabel>
+          <text>小霸王学习机横空出世</text>
+        </navLabel>
+        <content src="EPUB/chapter_12.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_13" playOrder="12">
+        <navLabel>
+          <text>股份制改革之殇</text>
+        </navLabel>
+        <content src="EPUB/chapter_13.xhtml"/>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="sep_2" playOrder="13">
+      <navLabel>
+        <text>第三章 风云再起，步步高集团下金蛋</text>
+      </navLabel>
+      <content src="EPUB/chapter_14.xhtml"/>
+      <navPoint class="chapter" id="chapter_15" playOrder="14">
+        <navLabel>
+          <text>君子之约，从小霸王到步步高</text>
+        </navLabel>
+        <content src="EPUB/chapter_15.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_16" playOrder="15">
+        <navLabel>
+          <text>告别家族企业，股份制上位</text>
+        </navLabel>
+        <content src="EPUB/chapter_16.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_17" playOrder="16">
+        <navLabel>
+          <text>无绳电话机的崛起</text>
+        </navLabel>
+        <content src="EPUB/chapter_17.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_18" playOrder="17">
+        <navLabel>
+          <text>广告“标王”</text>
+        </navLabel>
+        <content src="EPUB/chapter_18.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_19" playOrder="18">
+        <navLabel>
+          <text>步步高的步步高升</text>
+        </navLabel>
+        <content src="EPUB/chapter_19.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_20" playOrder="19">
+        <navLabel>
+          <text>攻读中欧国际工商学院MBA</text>
+        </navLabel>
+        <content src="EPUB/chapter_20.xhtml"/>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="sep_3" playOrder="20">
+      <navLabel>
+        <text>第四章 英雄的退幕和角色的转换</text>
+      </navLabel>
+      <content src="EPUB/chapter_21.xhtml"/>
+      <navPoint class="chapter" id="chapter_22" playOrder="21">
+        <navLabel>
+          <text>一分为三，退居幕后</text>
+        </navLabel>
+        <content src="EPUB/chapter_22.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_23" playOrder="22">
+        <navLabel>
+          <text>因爱隐退，大隐隐于市</text>
+        </navLabel>
+        <content src="EPUB/chapter_23.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_24" playOrder="23">
+        <navLabel>
+          <text>出手挽救网易，投资魔力初现</text>
+        </navLabel>
+        <content src="EPUB/chapter_24.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_25" playOrder="24">
+        <navLabel>
+          <text>巴菲特午餐</text>
+        </navLabel>
+        <content src="EPUB/chapter_25.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_26" playOrder="25">
+        <navLabel>
+          <text>提携黄峥，亦师亦友</text>
+        </navLabel>
+        <content src="EPUB/chapter_26.xhtml"/>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="sep_4" playOrder="26">
+      <navLabel>
+        <text>第五章 巴菲特投资理念的忠实拥趸</text>
+      </navLabel>
+      <content src="EPUB/chapter_27.xhtml"/>
+      <navPoint class="chapter" id="chapter_28" playOrder="27">
+        <navLabel>
+          <text>价值投资：带着步步高系员工一起投资苹果</text>
+        </navLabel>
+        <content src="EPUB/chapter_28.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_29" playOrder="28">
+        <navLabel>
+          <text>市场上的集中投资践行者</text>
+        </navLabel>
+        <content src="EPUB/chapter_29.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_30" playOrder="29">
+        <navLabel>
+          <text>选择合适的机会进行操作</text>
+        </navLabel>
+        <content src="EPUB/chapter_30.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_31" playOrder="30">
+        <navLabel>
+          <text>拿着时间宝典的投资者</text>
+        </navLabel>
+        <content src="EPUB/chapter_31.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_32" playOrder="31">
+        <navLabel>
+          <text>坚持按照自己的理解进行投资</text>
+        </navLabel>
+        <content src="EPUB/chapter_32.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_33" playOrder="32">
+        <navLabel>
+          <text>投资应该保持简化</text>
+        </navLabel>
+        <content src="EPUB/chapter_33.xhtml"/>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="sep_5" playOrder="33">
+      <navLabel>
+        <text>第六章 低调的务实者与一盘很大的棋</text>
+      </navLabel>
+      <content src="EPUB/chapter_34.xhtml"/>
+      <navPoint class="chapter" id="chapter_35" playOrder="34">
+        <navLabel>
+          <text>步步高系的第一个国际化品牌：OPPO</text>
+        </navLabel>
+        <content src="EPUB/chapter_35.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_36" playOrder="35">
+        <navLabel>
+          <text>拿下多个全球第一的vivo</text>
+        </navLabel>
+        <content src="EPUB/chapter_36.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_37" playOrder="36">
+        <navLabel>
+          <text>可穿戴产品行业的黑马：小天才电话手表</text>
+        </navLabel>
+        <content src="EPUB/chapter_37.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_38" playOrder="37">
+        <navLabel>
+          <text>拼多多的破与立</text>
+        </navLabel>
+        <content src="EPUB/chapter_38.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_39" playOrder="38">
+        <navLabel>
+          <text>企业内部需要反对的声音</text>
+        </navLabel>
+        <content src="EPUB/chapter_39.xhtml"/>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="sep_6" playOrder="39">
+      <navLabel>
+        <text>第七章 哲学与人生：回归本源</text>
+      </navLabel>
+      <content src="EPUB/chapter_40.xhtml"/>
+      <navPoint class="chapter" id="chapter_41" playOrder="40">
+        <navLabel>
+          <text>懂得享受生活，挖掘生命的快乐</text>
+        </navLabel>
+        <content src="EPUB/chapter_41.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_42" playOrder="41">
+        <navLabel>
+          <text>“投资是我的爱好，慈善才是我的工作”</text>
+        </navLabel>
+        <content src="EPUB/chapter_42.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_43" playOrder="42">
+        <navLabel>
+          <text>看透事物的本质，保持平常心</text>
+        </navLabel>
+        <content src="EPUB/chapter_43.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_44" playOrder="43">
+        <navLabel>
+          <text>敢为天下后</text>
+        </navLabel>
+        <content src="EPUB/chapter_44.xhtml"/>
+      </navPoint>
+      <navPoint class="chapter" id="chapter_45" playOrder="44">
+        <navLabel>
+          <text>做人要本分</text>
+        </navLabel>
+        <content src="EPUB/chapter_45.xhtml"/>
+      </navPoint>
+    </navPoint>
+  </navMap>
+</ncx>

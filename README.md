@@ -9,6 +9,7 @@
 | [annual-report-extractor](./annual-report-extractor/) | 从年报 PDF 提取财务数据和产能数据，支持自然语言指令自动解析公司名称、年份范围和数据字段 |
 | [buffett-perspective](./buffett-perspective/) | 沃伦·巴菲特的思维框架与表达方式，基于致股东的信（1965年至今）和公开演讲 |
 | [cninfo-annual-download](./cninfo-annual-download/) | 巨潮资讯网年报下载器，支持 A股（沪/深/北交所）和港股的年报、半年报、季报等定期报告下载 |
+| [duanyongping-perspective](./duanyongping-perspective/) | 段永平（大道）的思维框架与表达方式，基于一手资料（段永平传+雪球问答录81万字符）提炼5个核心心智模型、10条决策启发式 |
 | [hotlist-fetcher](./hotlist-fetcher/) | 抓取今日热榜（tophub.today）数据并保存为 Markdown，可对接 Obsidian 归档 |
 | [huashu-nuwa](./huashu-nuwa/) | 女娲造人：输入人名/主题/模糊需求，自动深度调研→思维框架提炼→生成可运行的人物 Skill |
 | [munger-perspective](./munger-perspective/) | 查理·芒格的思维框架与表达方式，基于《穷查理宝典》、股东会讲话、哈佛/USC 演讲等 120+ 来源 |
