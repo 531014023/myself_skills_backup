@@ -152,6 +152,7 @@ description: |
     └── sources/                      # 下载的一手素材
         ├── books/
         ├── transcripts/
+        ├── web/
         └── articles/
 ```
 
@@ -167,6 +168,8 @@ description: |
 ---
 
 ### Phase 1: 多源信息采集（并行Agent Swarm）
+
+> **资料收集规范**：执行前先读取 `references/extraction-framework.md` 第四章（4.1-4.4），严格遵循资料收集策略、网络资料本地化、用户资料优先级、调研完成标志的所有规则。
 
 启动6个并行subagent，每个负责不同信息维度。
 
