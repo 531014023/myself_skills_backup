@@ -16,6 +16,23 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 
+def is_captcha_page(content: str) -> bool:
+    """检测是否为验证码/异常页面，是则跳过"""
+    captcha_keywords = [
+        '验证码', '请先验证', 'captcha', '异常', '安全验证',
+        '请求异常', '稍后重试', '频繁', '请刷新重试',
+        '当前请求异常', '非法请求'
+    ]
+    content_lower = content.lower()
+    for kw in captcha_keywords:
+        if kw in content or kw.lower() in content_lower:
+            return True
+    # 短内容 + 无标题 = 大概率是错误页
+    if len(content.strip()) < 200 and '##' not in content:
+        return True
+    return False
+
+
 def get_clean_content(url: str, timeout: int = 30) -> dict:
     """
     获取网页的干净 Markdown 内容
@@ -46,6 +63,9 @@ def get_clean_content(url: str, timeout: int = 30) -> dict:
             result = fetch_url(clean_url, timeout)
             
             if result["success"] and len(result["content"]) > 100:
+                # 检测是否为验证码/异常页面，是则跳过尝试下一个服务
+                if is_captcha_page(result["content"]):
+                    continue
                 return {
                     "success": True,
                     "url": clean_url,
@@ -59,7 +79,15 @@ def get_clean_content(url: str, timeout: int = 30) -> dict:
     # 所有清洗服务都失败，尝试直接获取原始内容
     try:
         result = fetch_url(original_url, timeout)
-        if result["success"]:
+        if result["success"] and result["content"]:
+            if is_captcha_page(result["content"]):
+                return {
+                    "success": False,
+                    "url": original_url,
+                    "content": "",
+                    "source": "none",
+                    "error": "All services returned CAPTCHA or error pages"
+                }
             return {
                 "success": True,
                 "url": original_url,
