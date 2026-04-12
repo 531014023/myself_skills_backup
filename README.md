@@ -1,6 +1,6 @@
 # Claude Skills 技能库
 
-> 本目录包含 49 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
+> 本目录包含 50 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
 
 ---
 
@@ -72,6 +72,7 @@
 | [humanize-chinese](./humanize-chinese) | 去AI味 | 检测和改写中文AI生成文本。20+检测维度、7种风格转换、学术论文AIGC降重 |
 | [skill-creator](./skill-creator) | 技能创建指南 | 创建有效Skills的指南。包含目录结构、最佳实践、脚本/references/assets组织方式 |
 | [skill-vetter-1.0.0](./skill-vetter-1.0.0) | 技能安全审查 | AI agent技能的安全审查协议。安装前检查红标、权限范围、可疑模式 |
+| [llm-wiki](./llm-wiki) | LLM Wiki | 个人知识库管理系统。基于 Karpathy LLM Wiki 模式，AI负责知识整合、交叉引用、矛盾检测；人类负责素材采集和方向探索 |
 | [wechat-article-fetcher](./wechat-article-fetcher) | 微信文章抓取 | 微信公众号文章批量抓取，支持下载图片、转换Markdown/HTML格式 |
 | [algorithmic-art](./algorithmic-art) | 算法艺术 | 使用p5.js创建算法艺术，支持随机种子和交互式参数探索 |
 | [canvas-design](./canvas-design) | 画布设计 | 创建精美的.png和.pdf视觉艺术作品、海报、设计图 |
@@ -116,4 +117,4 @@
 
 ---
 
-*最后更新：2026-04-11*
+*最后更新：2026-04-12*
