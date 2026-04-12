@@ -1,6 +1,6 @@
 # Claude Skills 技能库
 
-> 本目录包含 50 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
+> 本目录包含 52 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
 
 ---
 
@@ -49,6 +49,7 @@
 | [hotlist-fetcher](./hotlist-fetcher) | 热榜抓取 | 自动抓取tophub.today热榜数据，整理成结构化Markdown文档（含平台统计、热点分类、选题建议） |
 | [wechat-article-search](./wechat-article-search) | 微信文章搜索 | 搜索微信公众号文章，返回标题、摘要、发布时间、来源公众号和链接 |
 | [find-skills](./find-skills) | 技能发现 | 从开放agent技能生态系统中发现和安装技能 |
+| [Playwright Scraper](./Playwright%20Scraper) | Playwright抓取 | Playwright隐身网页抓取，支持反爬绕过与验证码处理。动态页面、Cloudflare保护站点的克星 |
 
 ### 五、思维与工作流（8个）
 
