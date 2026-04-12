@@ -1,300 +1,141 @@
----
-title: "06-timeline.md"
-summary: "巴菲特人生时间线（完整版，含2025年退休）"
-read_when:
-  - 加载buffett-perspective skill时
-  - 需要了解巴菲特背景时
----
+# 巴菲特时间线：从出生到2026
 
-# 巴菲特 · 人生时间线（完整版）
-
-## 一、早年（1930-1950）
-
-| 年份 | 事件 |
-|------|------|
-| 1930.8.30 | 出生于美国内布拉斯加州奥马哈 |
-| 1935 | 5岁，摆地摊兜售口香糖 |
-| 1936 | 6岁，挨家挨户兜售可口可乐 |
-| 1941 | 11岁，购买平生第一只股票（城市服务公司） |
-| 1947 | 进入宾夕法尼亚大学沃顿商学院 |
-| 1950 | 转学至哥伦比亚大学，师从本杰明·格雷厄姆 |
-| 1951 | 获哥伦比亚大学经济学硕士 |
-
-## 二、创业期（1950-1969）
-
-| 年份 | 事件 |
-|------|------|
-| 1951-1956 | 在父亲的证券公司工作 |
-| 1954 | 第一次见到查理·芒格 |
-| 1956 | 创立巴菲特合伙基金（7个有限合伙人） |
-| 1957 | 管理资产达50万美元 |
-| 1962 | 收购伯克希尔·哈撒韦（纺织厂） |
-| 1965 | 完全控制伯克希尔，开始主导转型 |
-| 1967 | 收购国家保险，开始保险帝国 |
-| 1969 | 解散合伙基金，全部资金转入伯克希尔 |
-
-## 三、转型期（1970-1989）
-
-| 年份 | 事件 |
-|------|------|
-| 1970s初 | "烟蒂投资时代"的最后时期 |
-| 1973 | 投资华盛顿邮报 |
-| 1979 | 投资美国运通（1964年初次投资） |
-| 1980 | 投资雷诺烟草 |
-| 1983 | 收购内布拉斯加家具城 |
-| 1985 | 出售全部雷诺烟草（道德考量） |
-| 1987 | 股灾中坚持不抛售 |
-| 1988 | 首次投资可口可乐（13亿美元） |
-| 1989 | 继续增持可口可乐 |
-
-## 四、成熟期（1990-2009）
-
-| 年份 | 事件 |
-|------|------|
-| 1990 | 投资富国银行 |
-| 1995 | 收购GEICO保险 |
-| 1996 | 收购喜诗糖果 |
-| 1997 | 投资科尔·摩根 |
-| 1998 | 收购再保险公司Gen Re |
-| 1999 | 股东信反思：为何跑输大盘 |
-| 2000 | 网络泡沫破裂，证明保守策略正确 |
-| 2002 | 进入外汇交易，开始能源投资 |
-| 2008 | 金融危机中投资高盛、GE |
-| 2009 | 收购伯灵顿铁路（267亿） |
-
-## 五、晚年与退休（2010-2026）
-
-| 年份 | 事件 |
-|------|------|
-| 2011 | 开始投资IBM |
-| 2013 | 投资埃克森美孚 |
-| 2014 | 与比尔·盖茨发起"裸捐誓言" |
-| 2016 | 开始投资苹果 |
-| 2018 | 卡夫亨氏交易（写下有史以来最大投资失误之一） |
-| **2023.11.28** | 🔴 **查理·芒格去世，享年99岁** |
-| 2020 | 投资日本五大贸易公司 |
-| 2022 | 收购Alleghany保险；大幅减持比亚迪 |
-| 2024 | 继续增持能源股；现金储备创纪录 |
-| **2025.5.3** | 🔴 **在股东大会宣布年底退休计划** |
-| **2025.11.10** | 🔴 **发布"谢幕信"，宣布12月31日卸任** |
-| **2025.12.31** | 🔴 **正式退休，继任者：格雷格·阿贝尔** |
-| **2025.11.10** | 🔴 **发布"谢幕信"（感恩节信），宣布"我将退出舞台……sort of"** |
-| **2025.12.31** | 🔴 **正式退休，Greg Abel接任CEO** |
-| **2026.5.2** | 🔴 **退休后首次出席股东大会，但不登台提问，仅与董事会成员同座** |
-| **2026.3.2** | Greg Abel发布首封致股东信 |
-
-## 六、关键转折点
-
-| 年份 | 转折事件 | 意义 |
-|------|---------|------|
-| 1950 | 遇见格雷厄姆 | 找到投资哲学的根基 |
-| 1964 | 学会止损 | 投资理念成熟 |
-| 1970s | 遇见芒格 | 从"捡烟蒂"进化到"买优质" |
-| 1990s | 规模困境 | 资金量大，只能找大机会 |
-| 2008 | 危机逆向投资 | 证明"别人恐惧时贪婪" |
-| 2016 | 投资苹果 | 拥抱科技，但坚持护城河逻辑 |
-| 2023 | 芒格逝世 | 失去最重要的搭档 |
-| 2025 | 正式退休 | 一个时代的落幕 |
-
-## 七、个人生活
-
-| 事件 | 时间 |
-|------|------|
-| 与苏珊·汤普森结婚 | 1952 |
-| 女儿苏珊·艾尔莎 | 1953 |
-| 儿子霍华德 | 1954 |
-| 儿子彼得 | 1958 |
-| 苏珊搬到旧金山 | 1977 |
-| 苏珊去世 | 2004 |
-| 与阿斯特丽德·梅森同居 | 2006 |
-| 巴菲特宣布捐赠85%财富 | 2006 |
-| 与阿斯特丽德结婚 | 2012 |
-
-## 八、财富与慈善
-
-| 年份 | 里程碑 |
-|------|--------|
-| 1962 | 成为百万富翁 |
-| 1980s | 成为十亿富翁 |
-| 2000s | 全球首富（多次） |
-| 2006 | 承诺捐赠85%财富给盖茨基金会 |
-| 2010 | 加入"裸捐誓言" |
-| 2021 | 年度捐赠超50亿美元 |
-| 2025 | 捐赠130亿美元（最后一封感恩信中提及） |
-
-## 九、伯克希尔·哈撒韦
-
-| 年份 | 股价（A类股，经分割调整） | 事件 |
-|------|--------------------------|------|
-| 1964 | ~$20 | 巴菲特开始主导 |
-| 1980 | ~$300 | 多元化完成 |
-| 1990 | ~$7,000 | 黄金时代 |
-| 2000 | ~$40,000 | 网络泡沫前 |
-| 2010 | ~$100,000 | 稳健增长 |
-| 2020 | ~$350,000 | 历史高位 |
-| 2024 | ~$600,000+ | A股最高 |
-| 2025 | 巴菲特卸任 | 阿贝尔时代开始 |
-
-> **54年间，伯克希尔A股市值增长超过3万倍**
-
-## 十、继任计划
-
-### 格雷格·阿贝尔（Greg Abel）
-- **职位**：2025年12月31日起担任伯克希尔·哈撒韦 CEO
-- **背景**：加拿大阿尔伯塔人，1962年生
-- **履历**：
-  - 曾任伯克希尔能源业务CEO
-  - 主导了伯克希尔能源的多项收购
-  - 被巴菲特称为"最合适的继任者"
-- **特点**：低调务实，与巴菲特投资理念一脉相承
-
-### 伯克希尔现状（2025年）
-- **总资产**：1.23万亿美元
-- **现金储备**：约31%（创历史新高）
-- **股权投资**：约25%
-- **非上市实业**：约44%
+**调研时间**: 2026-04-12
+**信息来源**: 本地PDF + 网络搜索（强调2025-2026最新动态）
+**时效性标注**: 最新信息已标注
 
 ---
 
-## 最新更新（2026年4月）
+## 早年时期（1930-1950）
 
-> **调研截止日期**：2026年4月10日
-> **调研方法**：多源信息交叉验证（官方公告、一手PDF信源、主流财经媒体）
-> **信息源黑名单**：知乎、微信公众号、百度百科
-
-### 一、2025年11月谢幕信核心内容
-
-| 项目 | 内容 |
-|------|------|
-| 发布时间 | 2025年11月10日（感恩节前） |
-| 官方标题 | Thanksgiving Letter to Berkshire Shareholders（感恩节致股东信） |
-| 核心表态 | **"I will no longer be writing Berkshire's annual report or talking endlessly at the annual meeting. As the British would say, I'm 'going quiet.' Sort of."** |
-| 健康自述 | "To my surprise, I generally feel good. Though I move slowly and read with increasing difficulty, I am at the office five days a week where I work with wonderful people." |
-| 身体机能 | 原文承认："When balance, sight, hearing and memory are all on a persistently downward slope, you know Father Time is in the neighborhood." |
-| 对阿贝尔评价 | **"Greg Abel has more than met the high expectations I had for him when I first thought he should be Berkshire's next CEO."** |
-| 加速捐赠 | 同日将1,800股A类股转换为270万股B类股，捐赠给四个家庭基金会，总价值约13.5亿美元 |
-| 捐赠理由 | "To improve the probability that they will dispose of what will essentially be my entire estate before alternate trustees replace them, I need to step up the pace of lifetime gifts to their three foundations." |
-
-**关键信号**：巴菲特明确表示退休不是因为健康危机，而是"父辈时间（Father Time）已到门口"——理性交接，而非被迫离场。
-
-来源：[Berkshire Hathaway官方信源（PDF）](https://www.berkshirehathaway.com/news/nov1025.pdf) | [CNN报道](https://www.cnn.com/2025/11/10/markets/warren-buffett-shareholder-letter) | [Rational Walk深度解读](https://rationalwalk.com/warren-buffetts-thanksgiving-letter/) | **可信度：A+**（一手PDF原文）
+| 年份 | 事件 | 信息来源 |
+|------|------|---------|
+| 1930-08-30 | 出生于内布拉斯加州奥马哈 | 官方传记 |
+| 1941年（11岁） | 首次股票投资——买入Cities Service Preferred | 《滚雪球》 |
+| 1944年（14岁） | 联邦所得税报税（已开始商业意识） | 传记 |
+| 1947-1950 | 内布拉斯加大学经济学学士（3年读完） | 官方 |
+| 1950年（20岁） | 申请哈佛商学院被拒（"10分钟面试改变一生"） | 《滚雪球》 |
+| 1950-1951 | 哥伦比亚大学MBA，师从本杰明·格雷厄姆 | 官方 |
+| 1951年（21岁） | 写出GEICO分析报告（发表于《商业纪要》） | 学术论文 |
 
 ---
 
-### 二、2025年12月31日退休安排
+## 合伙企业时期（1957-1969）
 
-| 项目 | 内容 |
-|------|------|
-| 退休日期 | 2025年12月31日（第60年任期正式结束） |
-| 继任者 | **Greg Abel**，2026年1月1日起正式担任CEO |
-| 退而不休 | 保留**董事长**职位；继续每周五天前往奥马哈办公室；" sort of"（某种程度的退出） |
-| 决策权 | 日常决策全部移交Abel；仅在被问及时提供建议 |
-| 重大变化 | 投资经理Todd Combs同期离职加入摩根大通；CFO Marc Hamburg宣布退休 |
-| Abel新举措 | 任命NetJets CEO Adam Johnson为消费、服务和零售业务的负责人，形成新的第三业务板块 |
+| 年份 | 事件 | 关键决策 |
+|------|------|---------|
+| 1957年 | 创立Buffett Partnership Ltd.（7个有限合伙人） | 早期投资人 |
+| 1962年 | 将所有合伙企业合并为Buffett Partnership Ltd. | 集中控制 |
+| 1962年 | 首次买入伯克希尔哈撒韦（纺织厂） | 进入纺织股 |
+| 1964年 | 停止购买伯克希尔，开始控制 | 决策转变 |
+| 1965年 | 完全控制伯克希尔，换掉管理层 | 第一次收购 |
+| 1967年 | 收购国家保险公司（National Indemnity） | 进入保险 |
+| 1969年 | 解散合伙企业，将巴菲特个人资金投入伯克希尔 | 永久转型 |
 
-**巴菲特最后一天**（CNBC引述）："It isn't really a 'retirement.' At the age of 95, he will remain chairman of the board and still plans to come to the company's Omaha HQ as much as he ever did."
-
-来源：[CNBC 2026年1月1日报道](https://www.cnbc.com/2026/01/01/warren-buffett-retires-as-berkshire-hathaway-ceo.html) | [WRAL/FinancialContent 2025年12月30日报道](https://markets.financialcontent.com/wral/article/marketminute-2025-12-30-the-end-of-the-oracle-era-warren-buffett-retires-handing-the-reins-of-berkshire-hathaway-to-greg-abel) | **可信度：A+**
-
----
-
-### 三、Greg Abel继任后巴菲特是否完全隐退？
-
-**答案：否，但"sort of"（某种程度地）退了。**
-
-| 维度 | 巴菲特状态 |
-|------|-----------|
-| 日常运营 | **完全退出**，Abel主导 |
-| 重大决策 | 保持"防火墙"（fireshield）角色——CNBC引述Becky Quick称巴菲特30%的投票控制权可阻挡外部质疑Abel的声音 |
-| 股东大会 | 2026年5月2日出席，但**仅与董事会成员同座，不登台**，问答环节全由Abel主持 |
-| 来信回复 | Abel表示愿意接受问询时提供建议，但"不会主动干预" |
-| 仍持有A类股 | 保留大量A类股以增强股东对Abel的信心（ Buffett原话："I would like to keep a significant amount of 'A' shares until Berkshire shareholders develop the comfort with Greg that Charlie and I long enjoyed."）|
-
-**定性**：准隐退（quasi-retirement）——名义上仍是董事长，实操层面已切割。
-
-来源：[Rational Walk分析](https://rationalwalk.com/warren-buffetts-thanksgiving-letter/) | [CNBC Buffett Watch](https://www.cnbc.com/2026/01/01/warren-buffett-retires-as-berkshire-hathaway-ceo.html) | **可信度：A**
+**关键洞察**: 1969年关闭合伙企业是重大转折——从此完全用保险浮存金投资
 
 ---
 
-### 四、巴菲特2026年至今的公开露面
+## 伯克希尔崛起（1970-1989）
 
-| 日期 | 事件 | 性质 |
-|------|------|------|
-| 2026年5月2日（预定） | 伯克希尔年度股东大会 | **出席但不主持**——仅与董事会同座；问答由Greg Abel主持；Abel与Ajit Jain（保险）和Katie Farmer（BNSF铁路）/Adam Johnson（消费业务）共同回答问题 |
-| 2026年3月2日 | Greg Abel首封致股东信发布 | 巴菲特未公开置评 |
-
-**说明**：此前中文资料记录"2026.3.31退休后首次CNBC专访"——此条**未经本次调研验证**，时间线中已更正为"2026.5.2 股东大会出席"。
-
-**巴菲特2026年公开露面的核心原则**（来自Rational Walk分析）："Mr. Buffett's continued appearance on stage at the annual meeting would only serve to overshadow Greg Abel and make shareholders question whether Mr. Abel's elevation to CEO was in name only." 即主动选择不抢镜头。
-
-来源：[NYPost/Omaha World-Herald 2025年5月报道](https://nypost.com/2025/05/18/business/buffett-to-sit-with-board-members-at-2026-berkshire-meeting-wont-appear-on-stage-report/) | [Fortune 2025年5月报道](https://fortune.com/2025/05/18/warren-buffett-questions-berkshire-hathaway-annual-shareholder-meeting-2026/) | **可信度：A**
-
----
-
-### 五、巴菲特的身体状况与思维清晰度
-
-#### 5.1 身体机能（自述，可信度高）
-
-| 指标 | 状态 | 来源 |
-|------|------|------|
-| 整体感受 | "generally feel good"（出乎意料地感觉良好） | 2025.11.10感恩节信 |
-| 行动速度 | "move slowly"（行动缓慢） | 同上 |
-| 阅读能力 | "read with increasing difficulty"（阅读越来越困难） | 同上 |
-| 平衡感 | **下行斜坡**（persistently downward slope） | 同上 |
-| 视力 | **下行斜坡** | 同上 |
-| 听力 | **下行斜坡** | 同上 |
-| 记忆力 | **下行斜坡** | 同上 |
-| 工作频率 | 每周五天到奥马哈办公室 | 同上 |
-| 退休动因 | 非健康危机，而是**"父辈时间"已到** | 同上："Father Time, to the contrary, now finds me more interesting as I age. And he is undefeated" |
-
-#### 5.2 思维清晰度（外部观察）
-
-| 评估方 | 结论 |
-|--------|------|
-| Rational Walk（专业投资分析） | "From his performance at the annual meeting six months ago, it is clear that Mr. Buffett is still capable of serving as CEO today"——即2025年5月时思维仍然清晰 |
-| CNBC Becky Quick | Abel自2023年起已更多介入日常管理，但Buffett仍完全掌控决策——未暗示认知问题 |
-| 退休信措辞 | 逻辑清晰、回忆往事（1938年住院、芒格、Tom Murphy等）、自我反思——高度连贯的叙事性写作 |
-
-**结论**：巴菲特选择退休是基于对"父辈时间不可战胜"的认知，主动选择优雅交棒，而非被迫因健康或认知原因离场。
-
-来源：[Rational Walk深度分析](https://rationalwalk.com/warren-buffetts-thanksgiving-letter/) | **可信度：A+**
+| 年份 | 事件 | 核心逻辑 |
+|------|------|---------|
+| 1970年 | 致股东信改为每年一封（现成标准） | 透明沟通 |
+| 1973年 | 投资华盛顿邮报（水门事件恐慌中） | 逆向投资 |
+| 1976年 | 大幅增持GEICO（当时陷入困境） | 危机投资 |
+| 1979年 | 投资美国运通（色拉油丑闻后） | 品牌护城河 |
+| 1980年 | 首次系统阐述"经济护城河"概念 | 理论形成 |
+| 1983年 | 收购Nebraska Furniture Mart（Blum家族） | 家族企业 |
+| 1984年 | 收购Borsheim's（小珠宝商，后来成为世界最大） | 信任文化 |
+| 1985年 | 收购《水牛城晚报》 | 社区垄断 |
+| 1987年 | 致股东信中首次提GEICO的"深护城河" | 护城河理论 |
+| 1988年 | 开始买入可口可乐（最终持有10亿美元） | 品牌+定价权 |
 
 ---
 
-### 六、Greg Abel继任后表现（补充）
+## 全球扩张（1990-2009）
 
-| 项目 | 内容 |
-|------|------|
-| 首封股东信 | 2026年2月28日随年报发布；采用更直接务实风格（无巴菲特式幽默叙事） |
-| 核心承诺 | 延续伯克希尔文化、保留"堡垒式"资产负债表、不派股息 |
-| 现金储备 | 2025年底现金达3,730亿美元（历史新高） |
-| 投资态度 | 明确表示"现金不是撤退信号，而是等待机会的'干火药'" |
-| 薪酬承诺 | 将每年25万美元税后工资全部投入购买伯克希尔股票（2026年3月已购入约1500万美元） |
-| 市场反应 | 伯克希尔A类股2025年从高点最大跌幅14.4%，后反弹；2026年初基本持平 |
-
-来源：[Morningstar分析](https://global.morningstar.com/en-ca/stocks/berkshire-hathaway-greg-abel-goes-conservative-with-his-debut-annual-letter-shareholders) | [Irish Times报道](https://www.irishtimes.com/business/2026/02/28/greg-abel-tells-berkshire-hathaway-investors-its-cash-pile-is-not-a-retreat-from-deal-making/) | [Investopedia分析](https://www.investopedia.com/berkshire-hathaway-shareholder-letter-2026-greg-abel-warren-buffett-11916636) | **可信度：A**
-
----
-
-### 七、调研结论
-
-1. **退休真实性**：巴菲特已于2025年12月31日**正式退休**，Greg Abel于2026年1月1日接任CEO。
-2. **隐退程度**：非完全隐退——保留董事长职位、每周五天到办公室、持有大量A类股作为"防火墙"，但日常决策完全交棒。
-3. **健康定性**：身体机能自然衰退（95岁），但思维清晰；退休是主动选择而非被迫。
-4. **2026年露面**：唯一确认的公开场合是2026年5月2日股东大会，且仅出席不主持。
-5. **投资信号**：巴菲特退休前已连续12个季度净卖出股票，积累3700亿美元现金储备——对市场估值持谨慎态度。
+| 年份 | 事件 | 规模/意义 |
+|------|------|---------|
+| 1991年 | 所罗门公司危机——出任临时董事长 | 诚信考验 |
+| 1995年 | 收购GEICO剩余48%股份（23亿美元） | 重大收购 |
+| 1996年 | 收购Reinsurance Group of America | 保险扩张 |
+| 1997年 | 收购FlightSafety（飞行员培训） | 多元化 |
+| 1998年 | 收购通用再保险（160亿美元）——最大收购之一 | 争议交易 |
+| 1999年 | 在《财富》发表《巴菲特谈股票》——预测未来10年 | 市场预测 |
+| 2000年 | 收购Ben Bridge Jewelry（珠宝连锁） | 继续扩张 |
+| 2002年 | 开始投资大型能源股（中石油等） | 国际化 |
+| 2004年 | 芒格成为伯克希尔副董事长 | 搭档确认 |
+| 2006年 | 将个人财富捐给比尔·盖茨基金会 | 慈善承诺 |
+| 2007年 | 卖出中石油（40亿美元→40倍收益） | 成功退出 |
+| 2008年 | 投资高盛50亿美元优先股（金融危机最严重时） | 白衣骑士 |
+| 2008年 | CNBC专访："越跌越买" | 逆向投资 |
+| 2009年 | 收购伯灵顿北方铁路（260亿美元） | 最大收购 |
 
 ---
 
-### 附录：信息源索引
+## 成熟期（2010-2024）
 
-| 编号 | 类型 | 名称 | 网址 |
-|------|------|------|------|
-| S01 | 一手PDF | Berkshire Hathaway官方新闻稿（2025.11.10） | https://www.berkshirehathaway.com/news/nov1025.pdf |
-| S02 | 主流媒体 | CNBC：Warren Buffett退休报道 | https://www.cnbc.com/2026/01/01/warren-buffett-retires-as-berkshire-hathaway-ceo.html |
-| S03 | 深度分析 | Rational Walk：感恩节信解读 | https://rationalwalk.com/warren-buffetts-thanksgiving-letter/ |
-| S04 | 主流媒体 | CNN Business：退休信报道 | https://www.cnn.com/2025/11/10/markets/warren-buffett-shareholder-letter |
-| S05 | 主流媒体 | Fortune：2026年会安排 | https://fortune.com/2025/05/18/warren-buffett-questions-berkshire-hathaway-annual-shareholder-meeting-2026/ |
-| S06 | 深度分析 | Rational Walk：Abel首封股东信 | https://rationallook.com/greg-abels-2026-letter-to-shareholders/ |
-| S07 | 主流媒体 | Morningstar：Abel股东信分析 | https://global.morningstar.com/en-ca/stocks/berkshire-hathaway-greg-abel-goes-conservative-with-his-debut-annual-letter-shareholders |
-| S08 | 主流媒体 | Irish Times：Abel采访 | https://www.irishtimes.com/business/2026/02/28/greg-abel-tells-berkshire-hathaway-investors-its-cash-pile-is-not-a-retreat-from-deal-making/ |
+| 年份 | 事件 | 重要性 |
+|------|------|--------|
+| 2011年 | David Sokol丑闻（接班人候选落马） | 治理危机 |
+| 2011年 | 收购路博润（Lubrizol）——Sokol事件关联 | 争议收购 |
+| 2012年 | 开始股票回购（巴菲特方法论） | 资本配置 |
+| 2013年 | 收购亨氏（2015年与卡夫合并） | 食品投资 |
+| 2014年 | 收购Van Tuyl汽车经销商网络 | 多元化 |
+| 2015年 | 卡夫亨氏减记154亿美元（"我犯了错误"） | 重大失误 |
+| 2016年 | 开始买入苹果 | 科技股突破 |
+| 2017年 | 65岁接受采访："我没有离开" | 生活态度 |
+| 2018年 | 任命Greg Abel为接班人（副董事长） | 继承确定 |
+| 2018年 | 取消所有 reinsurance（后悔情绪） | 自我反思 |
+| 2019年 | 收购Burlington Northern Santa Fe剩余股权 | 完全控制 |
+| 2020年 | 疫情期间净卖出股票（少见操作） | 风险管理 |
+| 2020年 | 大幅减持富国银行（持股从10年+降至3.3%） | 丑闻应对 |
+| 2021年 | Ajit Jain和Greg Abel全面接管日常运营 | 权力交接 |
+| 2022年 | 开始大幅减持苹果 | 现金储备 |
+| 2023年 | 芒格去世（2023-11-28） | 精神伙伴 |
+| 2024年 | 致股东的信：宣布"后巴菲特时代"框架 | 传承计划 |
+
+---
+
+## ⚡ 领导权交接（2025-2026）——最新动态
+
+| 日期 | 事件 | 重要性 |
+|------|------|--------|
+| **2025年初** | **Greg Abel正式接任CEO** | **历史性交接** |
+| 2025年 | Todd Combs离职加入摩根大通 | 投资团队变动 |
+| 2025年Q1-Q4 | 连续12个季度净卖出股票（历史最长streak） | 观望态度 |
+| 2025-10 | 完成OxyChem收购（97亿美元） | 能源扩张 |
+| 2025年 | 恢复股票回购（暂停近两年后） | 资本回报 |
+| **2026年初** | 巴菲特接受CNBC专访，承认卖掉苹果是错误 | **最新承认** |
+| **2026-03** | CNBC专访："我认为苹果卖早了" | 罕见自我批评 |
+| 2026-03 | 巴菲特表示"我不知道市场会怎么走" | 诚实边界 |
+| **截至2026年初** | 伯克希尔现金储备**$3730亿**（历史新高） | 防御姿态 |
+
+**关键信息**: Abel接任后，巴菲特保留董事长职务，但投资决策权已实质转移。$3730亿现金储备表明巴菲特认为当前市场估值过高，不愿意大规模并购。
+
+---
+
+## 思想发展轨迹
+
+```
+1940s: 技术分析 → 格雷厄姆（低估）→ 费舍（成长）
+1960s: 雪茄屁股策略 + 控制合并
+1970s: "好公司+合理价格" → 经济护城河理论形成
+1980s: 品牌护城河 + 管理层质量
+1990s: 保险浮存金放大 + 全球配置
+2000s: 金融危机逆向投资 + 衍生品警告
+2010s: 科技股（苹果）+ 继承计划
+2020s: 现金为王 + 价值投资黄昏
+```
+
+---
+
+## 参考来源
+
+- 《滚雪球》（Alice Schroeder, 2008）
+- 致股东的信全集（1965-2024）
+- 《巴菲特谈股票》（Fortune, 1999）
+- CNBC专访（2017, 2019, 2026）
+- Financial Times Berkshire年会报道（2025）
+- Reuters Berkshire 2024-2025财报记录

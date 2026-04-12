@@ -1,6 +1,7 @@
 ---
 name: humanize-chinese
-description: Detect and humanize AI-generated Chinese text. 20+ detection categories, weighted 0-100 scoring
+description: >
+  Detect and humanize AI-generated Chinese text. 20+ detection categories, weighted 0-100 scoring
   with sentence-level analysis, 7 style transforms (casual/zhihu/xiaohongshu/wechat/academic/literary/weibo),
   sentence restructuring, context-aware replacement. Academic paper AIGC reduction for CNKI/VIP/Wanfang
   (知网/维普/万方 AIGC 检测降重), 10 academic detection dimensions, 120+ scholarly expression replacements,
