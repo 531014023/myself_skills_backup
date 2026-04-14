@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "prompt": "帮我抓取这个文章：https://mp.weixin.qq.com/s/xxxxx",
+    "expected": "调用 add_article.py 添加到CSV列表，或提示用户提供CSV路径/环境配置"
+  },
+  {
+    "id": 2,
+    "prompt": "批量下载CSV里的所有文章",
+    "expected": "调用 fetch_weixin_articles.py 开始批量抓取，报告开始抓取和预计数量"
+  },
+  {
+    "id": 3,
+    "prompt": "这个文章打不开了，帮我重新下载",
+    "expected": "检测链接问题，给出处理方案（检查progress.json/删除缓存/手动重新添加等）"
+  }
+]
