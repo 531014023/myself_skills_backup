@@ -1,6 +1,6 @@
 # Claude Skills 技能库
 
-> 本目录包含 52 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
+> 本目录包含 53 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
 
 ---
 
@@ -81,10 +81,11 @@
 | [slack-gif-creator](./slack-gif-creator) | Slack GIF制作 | 为Slack创建优化的动画GIF，提供约束条件和动画概念 |
 | [theme-factory](./theme-factory) | 主题工厂 | 10种预设主题（配色+字体），可为任何artifact应用主题或动态生成新主题 |
 
-### 七、开发工具（6个）
+### 七、开发工具（7个）
 
 | Skill | 名称 | 描述 |
 |-------|------|------|
+| [darwin-skill](./darwin-skill) | 技能优化器 | 自主优化SKILL.md的评估框架。8维度评分（结构60分+效果40分）、棘轮机制自动保留改进、git版本控制 |
 | [mcp-builder](./mcp-builder) | MCP服务器构建 | 构建高质量MCP（Model Context Protocol）服务器，集成外部API或服务，支持Python(FastMCP)和Node/TypeScript |
 | [webapp-testing](./webapp-testing) | Web应用测试 | 使用Playwright与本地Web应用交互和测试，支持验证功能、调试UI、截图、查看浏览器日志 |
 | [llmfit-advisor](./llmfit-advisor) | LLM适配建议 | 检测本地硬件（RAM/CPU/GPU/VRAM），推荐最佳本地LLM模型和量化方案 |
@@ -118,4 +119,4 @@
 
 ---
 
-*最后更新：2026-04-12*
+*最后更新：2026-04-14*
