@@ -76,12 +76,17 @@ python add_article.py "https://mp.weixin.qq.com/s/xxxxx"
 
 当用户需要从CSV批量下载文章时：
 
-**⚠️ 确认点：**
-1. 确认 `.env` 文件中 `OUTPUT_DIR` 配置正确
-2. 确认 `ARTICLES_CSV_FILE` 指向正确的CSV文件
-3. 确认CSV文件存在且有内容
-4. 告知用户预计抓取数量，请用户确认开始
+**Step 1. 确认环境**
+- 确认 `.env` 文件中 `OUTPUT_DIR` 配置正确
+- 确认 `ARTICLES_CSV_FILE` 指向正确的CSV文件
+- 确认CSV文件存在且有内容
+- 确认OUTPUT_DIR路径可写
 
+**Step 2. 告知用户并确认**
+- 告知用户预计抓取数量
+- 请用户确认是否开始
+
+**Step 3. 执行抓取**
 ```python
 # 使用 fetch_weixin_articles.py 脚本
 python fetch_weixin_articles.py
@@ -94,13 +99,14 @@ python fetch_weixin_articles.py
 - 保存为Markdown和HTML格式
 - 支持断点续传
 
-**Step 3. 监控进度**
-- 每个文章抓取后报告进度
+**Step 4. 监控进度**
+- 每个文章抓取后报告进度（序号/标题/状态）
 - 失败文章记录到日志，提供重试方案
 
-**Step 4. 完成报告**
+**Step 5. 完成报告**
 - 报告成功/失败数量
 - 列出失败的文章及原因
+- 提示查看日志文件获取详细信息
 
 ```
 wechat_articles_downloads/
@@ -224,6 +230,10 @@ python fetch_weixin_articles.py
 | CSV文件不存在 | 提示检查 ARTICLES_CSV_FILE 配置 |
 | 环境变量未配置 | 提示配置 OUTPUT_DIR 和 ARTICLES_CSV_FILE |
 | 图片下载失败 | 继续抓取文章，图片链接保留原样 |
+| CSV文件为空 | 提示CSV没有内容，无需抓取 |
+| 路径包含空格或中文 | 脚本会自动处理，无需用户干预 |
+| 重复抓取同一文章 | 跳过已抓取的文章（根据序号判断） |
+| User-Agent被封禁 | 降低请求频率，延长MIN_DELAY/MAX_DELAY |
 
 ## 参考代码
 
