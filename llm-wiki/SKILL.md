@@ -53,7 +53,7 @@ description: 个人知识库 / Wiki / 维基笔记管理系统。当提到「个
 LLM Wiki 是一种 AI 增强的知识管理范式：AI 不仅回答问题，更承担"簿记"工作——更新交叉引用、标注矛盾、保持一致性。人类聚焦于素材采集、探索提问和方向把控。
 
 **五大原则：**
-1. **原始素材不可变** — 永不修改 source 文档，只增不减
+1. **原始素材不可变** — 永不修改 raw 文档，只增不减
 2. **LLM 拥有 Wiki** — 用户阅读，LLM 负责写入和维护
 3. **知识复利** — 每一次摄入和查询都会丰富 Wiki
 4. **富维基** — 把有价值的分析沉淀回 Wiki，不要让好答案消失在聊天里
@@ -102,7 +102,8 @@ created: YYYY-MM-DD
 updated: YYYY-MM-DD
 tags: [tag1, tag2]
 confidence: high | medium | low
-raw: [YYYY-MM-DD-原文标题]
+raw: 
+  - "[[YYYY-MM-DD-原文标题]]"
 related:
   - "[[条目标题]]"
   - "[[另一标题]]"
@@ -120,7 +121,8 @@ created: 2026-04-12
 updated: 2026-04-12
 tags: [价值投资, 方法论, 老唐]
 confidence: high
-raw: [2026-04-12-至简三板斧]
+raw: 
+  - "[[2026-04-12-至简三板斧]]]"
 related:
   - "[[老唐投资体系]]"
   - "[[安全边际]]"
@@ -172,7 +174,8 @@ created: YYYY-MM-DD
 updated: YYYY-MM-DD
 tags: [tag1, tag2]
 confidence: high | medium | low
-raw: [YYYY-MM-DD-原文标题]
+raw: 
+  - "[[YYYY-MM-DD-原文标题]]"
 related:
   - "[[条目标题]]"
   - "[[另一标题]]"
