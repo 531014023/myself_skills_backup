@@ -222,43 +222,43 @@ if not account_name:
 
 # ========== 步骤2：从 IMA API 获取 KB_ID ==========
 print('获取知识库列表...')
-resp = requests.get('https://ima.qq.com/openapi/wiki/v1/knowledge_bases', headers=headers)
+resp = requests.post('https://ima.qq.com/openapi/wiki/v1/search_knowledge_base',
+                     headers=headers, json={"query": "", "cursor": "", "limit": 20})
 data = resp.json()
 if data.get('code') != 0:
     print('获取知识库失败:', data)
     exit(1)
 
-kb_list = data.get('data', {}).get('list', [])
+kb_list = data.get('data', {}).get('info_list', [])
 KB_ID = None
 for kb in kb_list:
     # 匹配公众号名（知识库名可能包含"文章备份"等后缀）
-    if account_name in kb.get('name', '') or kb.get('name', '') in account_name:
-        KB_ID = kb.get('id')
-        print(f'匹配到知识库: {kb.get("name")} (ID: {KB_ID})')
+    kb_name = kb.get('kb_name', '')
+    if account_name in kb_name or kb_name in account_name:
+        KB_ID = kb.get('kb_id')
+        print(f'匹配到知识库: {kb_name} (ID: {KB_ID})')
         break
 
 if not KB_ID:
     print(f'错误: 未找到与公众号 "{account_name}" 匹配的知识库')
-    print('可用的知识库:', [kb.get('name') for kb in kb_list])
+    print('可用的知识库:', [kb.get('kb_name') for kb in kb_list])
     exit(1)
 
-# ========== 步骤3：从 IMA API 获取 md/ 文件夹的 folder_id ==========
+# ========== 步骤3：从 IMA API 获取 MD 文件夹的 folder_id ==========
 print('获取文件夹列表...')
-resp = requests.get(
-    f'https://ima.qq.com/openapi/wiki/v1/folder/list?knowledge_base_id={KB_ID}',
-    headers=headers
-)
+resp = requests.post('https://ima.qq.com/openapi/wiki/v1/get_knowledge_list',
+                     headers=headers, json={"knowledge_base_id": KB_ID, "cursor": "", "limit": 50})
 data = resp.json()
 if data.get('code') != 0:
     print('获取文件夹失败:', data)
     exit(1)
 
-folder_list = data.get('data', {}).get('list', [])
+knowledge_list = data.get('data', {}).get('knowledge_list', [])
 FOLDER_ID = None
-for folder in folder_list:
-    # 找到名为 md 的文件夹
-    if folder.get('name') == 'md':
-        FOLDER_ID = folder.get('id')
+for item in knowledge_list:
+    # 文件夹的 media_type 是 99
+    if item.get('media_type') == 99 and item.get('title', '').lower() == 'md':
+        FOLDER_ID = item.get('media_id')
         print(f'找到 md 文件夹: ID = {FOLDER_ID}')
         break
 
