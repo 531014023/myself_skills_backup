@@ -110,7 +110,7 @@
 - 抓取前，先在 `raw/` 目录搜索该 URL（检查 frontmatter 的 `source` 字段）
 - **搜索方法**（Windows PowerShell）：
   ```powershell
-  cd ~/wiki/raw && Select-String -Pattern "source: https://..." -SimpleMatch
+  cd ./raw && Select-String -Pattern "source: https://..." -SimpleMatch
   ```
 - 如果已存在：
   - 向用户报告：`该文章已保存于 raw/YYYY-MM-DD-标题.md`
@@ -602,27 +602,6 @@ domains: [领域1, 领域2]
 | **high** | 高置信度 | 多个 sources 交叉验证，或作者本人确认 |
 | **medium** | 中等置信度 | 单一来源但可信度较高，或主流观点 |
 | **low** | 低置信度 | 单一来源、推断、待验证的观点 |
-
----
-
-## 目录结构
-
-```
-~/wiki/
-├── CLAUDE.md              # 本文件：Schema 规范
-├── index.md               # 内容索引（AI 维护）
-├── log.md                 # 操作日志（只追加）
-├── lint-report-*.md       # 体检报告
-├── raw/               # 原始素材（只读）
-│   └── YYYY-MM-DD-原文标题.md
-└── wiki/                  # AI 维护的知识条目（Karpathy 类型分类）
-    ├── 摘要/              # 单篇文章摘要
-    ├── 实体/              # 人、公司、产品
-    ├── 概念/              # 抽象概念、方法论
-    ├── 对比/              # 对比分析
-    ├── 概览/              # 主题概览
-    └── 综合/              # 跨主题综合
-```
 
 ---
 
