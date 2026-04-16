@@ -66,7 +66,7 @@ description: 个人知识库 / Wiki / 维基笔记管理系统。当提到「个
 ```
 raw/     → 原始素材（不可变）
 wiki/    → AI 合成的结构化知识条目（摘要/实体/概念/对比/概览/综合）
-CLAUDE.md → 项目行为规范（完整步骤在内部参考文档）
+CLAUDE.md → 项目行为规范（完整步骤在 references/ 目录）
 ```
 
 ---
@@ -81,7 +81,7 @@ CLAUDE.md → 项目行为规范（完整步骤在内部参考文档）
 
 **概要步骤：** 检查是否已存在 → 解析 → 存储 raw → 创建摘要 → 提取知识层 → 更新 index/log
 
-**详细内容** → 参见 `references/internal.md`
+**详细内容** → 参见 `references/ingest.md`
 
 ---
 
@@ -91,7 +91,7 @@ CLAUDE.md → 项目行为规范（完整步骤在内部参考文档）
 
 **概要步骤：** 理解问题 → 读 index 定位 → 遍历 wikilinks 综合回答 → 富维基触发
 
-**详细内容** → 参见 `references/internal.md`
+**详细内容** → 参见 `references/query.md`
 
 ---
 
@@ -101,7 +101,7 @@ CLAUDE.md → 项目行为规范（完整步骤在内部参考文档）
 
 **概要步骤：** 检查断链 → 发现矛盾 → 识别知识空白 → 输出报告
 
-**详细内容** → 参见 `references/internal.md`
+**详细内容** → 参见 `references/lint.md`
 
 ---
 
@@ -113,7 +113,7 @@ CLAUDE.md → 项目行为规范（完整步骤在内部参考文档）
 
 **执行：** 写入 raw → 执行完整 Ingest 流程 → 更新 index 和 log
 
-**详细内容** → 参见 `references/internal.md`
+**详细内容** → 参见 `references/query.md`
 
 ---
 
@@ -125,6 +125,6 @@ CLAUDE.md → 项目行为规范（完整步骤在内部参考文档）
 
 ## 禁止编造规则
 
-详细内容 → 参见 `SKILL-internal.md`
+详细内容 → 参见 `references/rules.md`
 
 ---
