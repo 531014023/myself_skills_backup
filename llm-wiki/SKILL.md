@@ -33,6 +33,22 @@ LLM Wiki 是一个基于 Karpathy LLM Wiki 理念的个人知识管理系统。A
 **快速开始：**
 1. 初始化知识库 → 2. 摄入素材 → 3. 查询知识 → 4. 定期体检
 
+**Obsidian 集成：**
+
+推荐使用 Obsidian 作为 Wiki 查看器：
+
+| 插件 | 用途 |
+|------|------|
+| **Graph View** | 可视化条目间的链接关系 |
+| **Dataview** | 查询 frontmatter 元数据（如 `confidence: high`） |
+| **Web Clipper** | 将网页转为 Markdown，直接摄入 raw |
+| **Templates** | 标准化条目格式 |
+
+**其他工具：**
+- **Git**: Wiki 即 Markdown 文件的 Git 仓库 — 版本历史、分支、协作
+- **Marp**: 从 Wiki 内容生成幻灯片
+- **图片**: 下载到本地附件目录，确保长期可访问
+
 ---
 
 ## ⚠️ 边界声明
