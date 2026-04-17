@@ -13,10 +13,11 @@ description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库
 
 **操作拦截：**
 如果用户尝试执行 ingest/query/lint 等日常操作：
-1. 读取 `{skill-root}/config.yaml` 获取知识库列表
-2. 如果有多个知识库 → 展示列表让用户选择
-3. 用户选择后 → cd 到对应目录
+1. 读取 `{skill-root}/config.yaml` 获取知识库列表和默认知识库
+2. 优先使用默认知识库，只有没有默认知识库或用户要求切换时才展示列表
+3. 用户选择后 → cd 到对应目录 → 更新默认知识库
 4. 加载该知识库的 schema 文件（由初始化时指定，如 `CLAUDE.md` 或 `AGENTS.md`）→ 执行对应操作
+5. 提示用户当前所在知识库：`当前知识库：{名称} ({路径})`
 
 ---
 
@@ -72,8 +73,10 @@ LLM Wiki 是一个基于 Karpathy LLM Wiki 理念的个人知识管理系统。A
 
 **格式：**
 ```yaml
+default_knowledge_base: wiki
+
 knowledge_bases:
-  - name: 主知识库
+  - name: wiki
     path: ~/wiki
     schema: CLAUDE.md
   - name: 投资库
@@ -124,11 +127,14 @@ knowledge-base-name/
    - 最后更新日期改为实际复制日期
 
 **Step 4. 注册到 config.yaml**
-将新知识库追加到 `{skill-root}/config.yaml`，包含 name、path 和 schema 文件名
+将新知识库追加到 `{skill-root}/config.yaml`，包含 name、path 和 schema 文件名，并将 `default_knowledge_base` 更新为新知识库名称
 
-**Step 5. 初始化完成**
-- 确认目录结构已创建
-- 告知用户后续操作
+**Step 5. 切换到新知识库**
+- `cd` 到新创建的知识库目录
+- 提示用户：`知识库创建完成。当前知识库：{名称} ({路径})`
+
+**Step 6. 告知用户后续操作**
+- 提示用户：已自动切换到新创建的知识库，可以直接进行摄入、查询等操作
 
 ---
 
@@ -137,23 +143,23 @@ knowledge-base-name/
 **入口：** 用户说"切换到投资库"、"操作主知识库"、或执行 ingest/query/lint 等日常操作
 
 **Step 1. 读取配置文件**
-读取 `{skill-root}/config.yaml`，解析知识库列表
+读取 `{skill-root}/config.yaml`，解析知识库列表和默认知识库
 
-**Step 2. 展示知识库列表**
-如果有多条知识库，展示选择菜单：
-```
-可用知识库：
-1. 主知识库 (~/wiki)
-2. 投资库 (~/invest-wiki)
-请选择操作的知识库：
-```
+**Step 2. 确定目标知识库**
+- 如果用户明确指定 → 使用用户指定的知识库
+- 如果用户未指定且有默认知识库 → 使用默认知识库
+- 如果没有默认知识库或用户要求切换 → 展示知识库列表供选择
 
-**Step 3. 用户选择后**
-- `cd` 到对应目录
+**Step 3. 切换并加载**
+- `cd` 到对应知识库目录
+- 将 `default_knowledge_base` 更新为当前知识库
 - 加载该知识库的 schema 文件（如 `CLAUDE.md` 或 `AGENTS.md`）
 
-**Step 4. 加载 schema 文件执行操作**
+**Step 4. 执行操作**
 后续操作遵循该 schema 文件中的规范执行
+
+**⚠️ 切换知识库提示：**
+每次切换知识库后，在开始操作前提示用户当前所在知识库名称，格式：`当前知识库：{名称} ({路径})`
 
 ---
 

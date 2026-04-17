@@ -1,7 +1,12 @@
 # LLM Wiki 多知识库配置
 # 使用 YAML 格式配置知识库列表
 
+default_knowledge_base: wiki
+
 knowledge_bases:
   - name: wiki
     path: ~/wiki
     schema: CLAUDE.md
+  - name: knowledge
+    path: D:/Yugongyipan/Users/53101/Desktop/project/codebuddy/knowledge
+    schema: AGENTS.md
