@@ -96,7 +96,7 @@ knowledge_bases:
 使用 `AskUserQuestion` 工具以选项卡形式引导用户选择，AI根据当前上下文自动生成合适的选项：
 - 创建位置（默认 `~`）
 - 知识库名称（作为目录名，默认 `wiki`）
-- Schema 文件名
+- Schema 文件名（默认 `CLAUDE.md`，可选 `AGENTS.md` 或自定义）
 - **实际创建路径 = `{创建位置}/{知识库名称}/`**
 
 **Step 2. 创建项目目录结构**
