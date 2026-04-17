@@ -117,6 +117,10 @@ knowledge-base-name/
 1. 将 `references/schema-template.md` 复制到目标目录
 2. 重命名为用户选择的 schema 文件名
 3. 将模板中的 `{{schema-name}}` 占位符替换为用户指定的 schema 文件名（不含扩展名）
+4. 复制后需做以下调整：
+   - 标题删除"（项目初始化模板）"字样
+   - 第一行描述改为"本文件为 LLM Wiki 项目的行为规范文档，定义了 Ingest/Query/Lint 三大核心操作、格式规范和禁止规则。"
+   - 最后更新日期改为实际复制日期
 
 **Step 4. 注册到 config.yaml**
 将新知识库追加到 `{skill-root}/config.yaml`，包含 name、path 和 schema 文件名
