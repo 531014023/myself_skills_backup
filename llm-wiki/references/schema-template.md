@@ -1,6 +1,6 @@
-# CLAUDE.md - LLM Wiki Schema（项目初始化模板）
+# {{schema-name}}.md - LLM Wiki Schema（项目初始化模板）
 
-> 本文件为 LLM Wiki 项目的 Schema 初始化模板。当用户使用 llm-wiki skill 初始化新项目时，将本文件内容复制为目标项目的 `CLAUDE.md`。
+> 本文件为 LLM Wiki 项目的 Schema 初始化模板。当用户使用 llm-wiki skill 初始化新项目时，将本文件内容复制为目标项目的 `{{schema-name}}.md`。
 >
 > 本模板基于当前最新实践更新，包含了完整的日常运行规范（Ingest/Query/Lint 三大核心操作、格式规范、禁止规则）。
 
@@ -24,7 +24,7 @@
 ```
 ┌─────────────────────────────────────────┐
 │  Layer 3: Schema (规范文档)              │
-│  - CLAUDE.md (本文件)                    │
+│  - {{schema-name}}.md (本文件)           │
 │  - 定义结构、约定、工作流程               │
 ├─────────────────────────────────────────┤
 │  Layer 2: Wiki (AI 维护的知识条目)        │

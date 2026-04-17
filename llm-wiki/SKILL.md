@@ -62,12 +62,15 @@ knowledge-base-name/
 │   ├── 对比/                         # 多方案对比分析
 │   ├── 概览/                         # 主题/体系概览
 │   └── 综合/                         # 跨领域综合
+├── {{schema-name}}.md                 # Schema 规范文件
 ├── index.md                          # 内容索引
 └── log.md                            # 操作日志
 ```
 
-**Step 3. 复制 schema-template.md 为用户指定的 schema 文件名**
-将 `references/schema-template.md` 复制到目标目录，命名为用户选择的 schema 文件名
+**Step 3. 复制并替换占位符**
+1. 将 `references/schema-template.md` 复制到目标目录
+2. 重命名为用户选择的 schema 文件名
+3. 将模板中的 `{{schema-name}}` 占位符替换为用户指定的 schema 文件名（不含扩展名）
 
 **Step 4. 注册到 config.yaml**
 将新知识库追加到 `{skill-root}/config.yaml`，包含 name、path 和 schema 文件名
