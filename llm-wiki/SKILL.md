@@ -1,6 +1,6 @@
 ---
 name: llm-wiki
-description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库；2）操作已有知识库（通过config.yaml配置多知识库）。当提到「初始化 wiki、创建 wiki 项目、新建知识库、添加知识库、注册知识库」时触发。
+description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库；2）操作已有知识库（通过config.yaml配置多知识库）。当提到「初始化 wiki、创建 wiki 项目、新建知识库、添加知识库、注册知识库、微信文章存入wiki、微信文章整理到知识库、做个摘要」时触发。
 ---
 
 # LLM Wiki - 个人知识库
