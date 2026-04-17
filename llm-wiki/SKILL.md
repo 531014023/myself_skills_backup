@@ -1,6 +1,6 @@
 ---
 name: llm-wiki
-description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库；2）操作已有知识库（通过环境变量配置多知识库）。当提到「初始化 wiki、创建 wiki 项目、新建知识库、添加知识库、注册知识库」时触发。
+description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库；2）操作已有知识库（通过config.yaml配置多知识库）。当提到「初始化 wiki、创建 wiki 项目、新建知识库、添加知识库、注册知识库」时触发。
 ---
 
 # LLM Wiki - 个人知识库
@@ -13,20 +13,25 @@ description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库
 
 **操作拦截：**
 如果用户尝试执行 ingest/query/lint 等日常操作：
-1. 检查 `LLM_WIKI_KBS` 环境变量
+1. 读取 `config.yaml` 获取知识库列表
 2. 如果有多个知识库 → 展示列表让用户选择
-3. 用户选择后 → 设置 `LLM_WIKI_KB_NAME` 和 `LLM_WIKI_KB_PATH` → cd 到对应目录
+3. 用户选择后 → cd 到对应目录
 4. 加载该知识库的 `CLAUDE.md` → 执行对应操作
 
 ---
 
-## 环境变量说明
+## 配置文件
 
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| `LLM_WIKI_KBS` | 知识库列表（JSON数组） | `[{"name":"主知识库","path":"~/wiki"}]` |
-| `LLM_WIKI_KB_NAME` | 当前操作的知识库名称 | `主知识库` |
-| `LLM_WIKI_KB_PATH` | 当前操作的知识库路径 | `~/wiki` |
+**路径：** `~/.claude/skills/llm-wiki/config.yaml`
+
+**格式：**
+```yaml
+knowledge_bases:
+  - name: 主知识库
+    path: ~/wiki
+  - name: 投资库
+    path: ~/invest-wiki
+```
 
 ---
 
@@ -59,8 +64,8 @@ knowledge-base-name/
 **Step 3. 复制 schema-template.md 为 CLAUDE.md**
 将 `references/schema-template.md` 复制到目标目录作为 `CLAUDE.md`
 
-**Step 4. 注册到环境变量**
-将新知识库追加到 `LLM_WIKI_KBS` 环境变量
+**Step 4. 注册到 config.yaml**
+将新知识库追加到 `~/.claude/skills/llm-wiki/config.yaml`
 
 **Step 5. 初始化完成**
 - 确认目录结构已创建
@@ -72,8 +77,8 @@ knowledge-base-name/
 
 **入口：** 用户说"切换到投资库"、"操作主知识库"、或执行 ingest/query/lint 等日常操作
 
-**Step 1. 检查环境变量**
-读取 `LLM_WIKI_KBS` 环境变量，解析出知识库列表
+**Step 1. 读取配置文件**
+读取 `~/.claude/skills/llm-wiki/config.yaml`，解析知识库列表
 
 **Step 2. 展示知识库列表**
 如果有多条知识库，展示选择菜单：
@@ -85,8 +90,6 @@ knowledge-base-name/
 ```
 
 **Step 3. 用户选择后**
-- 设置 `LLM_WIKI_KB_NAME=用户选择的知识库名称`
-- 设置 `LLM_WIKI_KB_PATH=对应路径`
 - `cd` 到对应目录
 - 加载该知识库的 `CLAUDE.md`
 
@@ -95,11 +98,11 @@ knowledge-base-name/
 
 ---
 
-### 3. 配置知识库环境变量
+### 3. 配置知识库
 
 **触发词：** 添加知识库、注册知识库、切换知识库
 
 **执行步骤：**
 1. 询问知识库名称和路径
-2. 更新 `LLM_WIKI_KBS` 环境变量（追加新知识库）
+2. 更新 `~/.claude/skills/llm-wiki/config.yaml`（追加新知识库）
 3. 确认完成
