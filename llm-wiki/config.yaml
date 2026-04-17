@@ -4,3 +4,4 @@
 knowledge_bases:
   - name: 主知识库
     path: ~/wiki
+    schema: CLAUDE.md

@@ -13,10 +13,10 @@ description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库
 
 **操作拦截：**
 如果用户尝试执行 ingest/query/lint 等日常操作：
-1. 读取 `config.yaml` 获取知识库列表
+1. 读取 `{skill-root}/config.yaml` 获取知识库列表
 2. 如果有多个知识库 → 展示列表让用户选择
 3. 用户选择后 → cd 到对应目录
-4. 加载该知识库的 `CLAUDE.md` → 执行对应操作
+4. 加载该知识库的 schema 文件（由初始化时指定，如 `CLAUDE.md` 或 `AGENTS.md`）→ 执行对应操作
 
 ---
 
@@ -29,8 +29,10 @@ description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库
 knowledge_bases:
   - name: 主知识库
     path: ~/wiki
+    schema: CLAUDE.md
   - name: 投资库
     path: ~/invest-wiki
+    schema: AGENTS.md
 ```
 
 ---
@@ -44,6 +46,10 @@ knowledge_bases:
 **Step 1. 询问项目信息**
 - 知识库名称（作为外层目录名）
 - 创建位置（默认 `~/wiki`）
+- Schema 文件名：
+  - Claude Code → `CLAUDE.md`
+  - 通用/其他 Agent → `AGENTS.md`
+  - 或自定义名称
 
 **Step 2. 创建项目目录结构**
 ```
@@ -56,16 +62,15 @@ knowledge-base-name/
 │   ├── 对比/                         # 多方案对比分析
 │   ├── 概览/                         # 主题/体系概览
 │   └── 综合/                         # 跨领域综合
-├── CLAUDE.md                         # 项目行为规范
 ├── index.md                          # 内容索引
 └── log.md                            # 操作日志
 ```
 
-**Step 3. 复制 schema-template.md 为 CLAUDE.md**
-将 `references/schema-template.md` 复制到目标目录作为 `CLAUDE.md`
+**Step 3. 复制 schema-template.md 为用户指定的 schema 文件名**
+将 `references/schema-template.md` 复制到目标目录，命名为用户选择的 schema 文件名
 
 **Step 4. 注册到 config.yaml**
-将新知识库追加到 `{skill-root}/config.yaml`
+将新知识库追加到 `{skill-root}/config.yaml`，包含 name、path 和 schema 文件名
 
 **Step 5. 初始化完成**
 - 确认目录结构已创建
@@ -91,10 +96,10 @@ knowledge-base-name/
 
 **Step 3. 用户选择后**
 - `cd` 到对应目录
-- 加载该知识库的 `CLAUDE.md`
+- 加载该知识库的 schema 文件（如 `CLAUDE.md` 或 `AGENTS.md`）
 
-**Step 4. 加载 CLAUDE.md 执行操作**
-后续操作遵循 CLAUDE.md 中的规范执行
+**Step 4. 加载 schema 文件执行操作**
+后续操作遵循该 schema 文件中的规范执行
 
 ---
 
