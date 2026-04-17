@@ -152,7 +152,7 @@ knowledge-base-name/
 
 **Step 3. 切换并加载**
 - `cd` 到对应知识库目录
-- 将 `default_knowledge_base` 更新为当前知识库
+- 将 `{skill-root}/config.yaml` 中的 `default_knowledge_base` 字段更新为新切换的知识库名称
 - 加载该知识库的 schema 文件（如 `CLAUDE.md` 或 `AGENTS.md`）
 
 **Step 4. 执行操作**
