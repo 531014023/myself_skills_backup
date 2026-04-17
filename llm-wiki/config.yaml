@@ -7,6 +7,3 @@ knowledge_bases:
   - name: wiki
     path: ~/wiki
     schema: CLAUDE.md
-  - name: knowledge
-    path: D:/Yugongyipan/Users/53101/Desktop/project/codebuddy/knowledge
-    schema: AGENTS.md

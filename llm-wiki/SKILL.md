@@ -145,17 +145,23 @@ knowledge-base-name/
 **Step 1. 读取配置文件**
 读取 `{skill-root}/config.yaml`，解析知识库列表和默认知识库
 
-**Step 2. 确定目标知识库**
+**Step 2. 检查知识库是否存在**
+遍历 `knowledge_bases` 列表，检查每个知识库的 `path` 路径是否仍然存在。如果路径不存在：
+- 从 `knowledge_bases` 中删除该知识库
+- 如果删除的是默认知识库，将 `default_knowledge_base` 更新为列表中的第一个知识库（如果有）
+- 提示用户已自动清理不存在的知识库
+
+**Step 3. 确定目标知识库**
 - 如果用户明确指定 → 使用用户指定的知识库
 - 如果用户未指定且有默认知识库 → 使用默认知识库
 - 如果没有默认知识库或用户要求切换 → 展示知识库列表供选择
 
-**Step 3. 切换并加载**
+**Step 4. 切换并加载**
 - `cd` 到对应知识库目录
 - 将 `{skill-root}/config.yaml` 中的 `default_knowledge_base` 字段更新为新切换的知识库名称
 - 加载该知识库的 schema 文件（如 `CLAUDE.md` 或 `AGENTS.md`）
 
-**Step 4. 执行操作**
+**Step 5. 执行操作**
 后续操作遵循该 schema 文件中的规范执行
 
 **⚠️ 切换知识库提示：**
