@@ -93,23 +93,7 @@ knowledge_bases:
 **触发词：** 初始化 wiki、创建 wiki 项目、新建知识库
 
 **Step 1. 使用 AskUserQuestion 工具收集信息**
-使用 `AskUserQuestion` 工具以选项卡形式收集信息：
-
-1. **创建位置**（header: `创建位置`）
-   - 选项：`~ (C:\Users\53101\)`（默认）、`D:\KnowledgeBase`、`C:\Projects`、自定义
-   - 选择后进入下一步
-
-2. **知识库名称**（header: `知识库名称`）
-   - 选项：`wiki`（默认）、`knowledge`、`自定义名称`
-   - 选择后进入下一步
-
-3. **Schema 文件**（header: `Schema`）
-   - 选项：`CLAUDE.md (Claude Code)`、`AGENTS.md (通用/其他Agent)`、`自定义`
-   - 选择后进入下一步
-
-4. **确认**（header: `确认创建`）
-   - 选项：`确认创建`、`返回修改`
-   - 确认后进入目录创建步骤
+使用 `AskUserQuestion` 工具以选项卡形式引导用户选择，每次展示当前步骤的所有选项，用户选择后进入下一步骤。
 
 **Step 2. 创建项目目录结构**
 ```
