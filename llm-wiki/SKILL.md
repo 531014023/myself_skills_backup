@@ -93,8 +93,8 @@ knowledge_bases:
 **触发词：** 初始化 wiki、创建 wiki 项目、新建知识库
 
 **Step 1. 询问项目信息**
-- 知识库名称（作为目录名，默认 `wiki`）
 - 创建位置（默认 `~`，即 `C:\Users\53101\`）
+- 知识库名称（作为目录名，默认 `wiki`）
 - Schema 文件名：
   - Claude Code → `CLAUDE.md`
   - 通用/其他 Agent → `AGENTS.md`
