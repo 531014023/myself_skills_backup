@@ -78,7 +78,7 @@ knowledge_bases:
     schema: CLAUDE.md
   - name: 投资库
     path: ~/invest-wiki
-    schema: AGENTS.md
+    schema: CLAUDE.md
 ```
 
 ---
@@ -90,12 +90,13 @@ knowledge_bases:
 **触发词：** 初始化 wiki、创建 wiki 项目、新建知识库
 
 **Step 1. 询问项目信息**
-- 知识库名称（作为外层目录名）
-- 创建位置（默认 `~/wiki`）
+- 知识库名称（作为目录名，默认 `wiki`）
+- 创建位置（默认 `~`，即 `C:\Users\53101\`）
 - Schema 文件名：
   - Claude Code → `CLAUDE.md`
   - 通用/其他 Agent → `AGENTS.md`
   - 或自定义名称
+- **实际创建路径 = `{创建位置}/{知识库名称}/`**
 
 **Step 2. 创建项目目录结构**
 ```
