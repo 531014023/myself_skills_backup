@@ -22,7 +22,7 @@ description: LLM Wiki 个人知识库管理。支持：1）初始化新知识库
 
 ## 配置文件
 
-**路径：** `~/.claude/skills/llm-wiki/config.yaml`
+**路径：** 与 SKILL.md 同目录下的 `config.yaml`
 
 **格式：**
 ```yaml
@@ -65,7 +65,7 @@ knowledge-base-name/
 将 `references/schema-template.md` 复制到目标目录作为 `CLAUDE.md`
 
 **Step 4. 注册到 config.yaml**
-将新知识库追加到 `~/.claude/skills/llm-wiki/config.yaml`
+将新知识库追加到 `{skill-root}/config.yaml`
 
 **Step 5. 初始化完成**
 - 确认目录结构已创建
@@ -78,7 +78,7 @@ knowledge-base-name/
 **入口：** 用户说"切换到投资库"、"操作主知识库"、或执行 ingest/query/lint 等日常操作
 
 **Step 1. 读取配置文件**
-读取 `~/.claude/skills/llm-wiki/config.yaml`，解析知识库列表
+读取 `{skill-root}/config.yaml`，解析知识库列表
 
 **Step 2. 展示知识库列表**
 如果有多条知识库，展示选择菜单：
@@ -104,5 +104,5 @@ knowledge-base-name/
 
 **执行步骤：**
 1. 询问知识库名称和路径
-2. 更新 `~/.claude/skills/llm-wiki/config.yaml`（追加新知识库）
+2. 更新 `{skill-root}/config.yaml`（追加新知识库）
 3. 确认完成
