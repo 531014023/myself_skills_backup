@@ -93,13 +93,10 @@ knowledge_bases:
 **触发词：** 初始化 wiki、创建 wiki 项目、新建知识库
 
 **Step 1. 询问项目信息**
-使用 `AskUserQuestion` 工具以选项卡形式引导用户选择：
-- 创建位置（默认 `~`，即 `C:\Users\53101\`）
+使用 `AskUserQuestion` 工具以选项卡形式引导用户选择，AI根据当前上下文自动生成合适的选项：
+- 创建位置（默认 `~`）
 - 知识库名称（作为目录名，默认 `wiki`）
-- Schema 文件名：
-  - Claude Code → `CLAUDE.md`
-  - 通用/其他 Agent → `AGENTS.md`
-  - 或自定义名称
+- Schema 文件名
 - **实际创建路径 = `{创建位置}/{知识库名称}/`**
 
 **Step 2. 创建项目目录结构**
