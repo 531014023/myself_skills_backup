@@ -20,10 +20,11 @@ PLATE_URL = "https://www.cninfo.com.cn/new/disclosure/stock"
 ANNOUNCEMENT_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
 FILE_BASE_URL = "https://static.cninfo.com.cn/"
 
-# 分类配置: (目录名, A股searchkey模板, 港股searchkey, 报告类型)
+# 分类配置: (目录名, A股searchkey模板, 港股searchkey或(优先,备用), 报告类型)
 # A股年报: "2024年年度报告" / 港股年报: "截至二零二五年十二月三十一日止年度全年业绩公布"
+# 港股searchkey可以是字符串，也可以是元组(优先搜索, 备用搜索)，用于优先下载正式年报
 CATEGORY_CONFIG = {
-    '年报':   ('年报',   '{year}年年度报告', '全年业绩',    'annual'),
+    '年报':   ('年报',   '{year}年年度报告', ('年报', '全年业绩'), 'annual'),
     '半年报': ('半年报', '{year}年半年度报告', '六个月业绩', 'half'),
     '一季报': ('一季报', '{year}年一季报',     '三个月业绩', 'q1'),
     '三季报': ('三季报', '{year}年三季报',     '九个月业绩', 'q3'),
@@ -316,9 +317,20 @@ def generate_filename(announcement, date_str):
     return '_'.join(parts) + '.pdf'
 
 
-def download_reports(stock_code, org_id, plate, category_name, searchkey, save_dir, report_type, year=None):
-    """下载报告"""
+def download_reports(stock_code, org_id, plate, category_name, searchkey, save_dir, report_type, year=None, fallback_searchkey=None):
+    """
+    下载报告
+    
+    Args:
+        fallback_searchkey: 备用搜索关键词，当主搜索无结果时使用（港股年报用）
+    """
     announcements = fetch_announcements(stock_code, org_id, plate, searchkey)
+    
+    # 如果没有找到且设置了备用关键词，尝试备用搜索
+    if not announcements and fallback_searchkey:
+        print(f"  主搜索无结果，尝试备用搜索: {fallback_searchkey}")
+        announcements = fetch_announcements(stock_code, org_id, plate, fallback_searchkey)
+    
     if not announcements:
         print(f"  未找到匹配的{category_name}")
         return 0
@@ -412,8 +424,15 @@ def main():
         dir_name, a_share_searchkey_template, hke_searchkey, report_type = config
 
         # 港股和A股使用不同的搜索关键词
+        fallback_searchkey = None
         if hke:
-            searchkey = hke_searchkey
+            # 港股searchkey可能是元组(优先,备用)或字符串
+            if isinstance(hke_searchkey, tuple):
+                searchkey = hke_searchkey[0]
+                fallback_searchkey = hke_searchkey[1]
+                print(f"  [港股优先搜索: {searchkey}, 备用: {fallback_searchkey}]")
+            else:
+                searchkey = hke_searchkey
             if year:
                 print(f"  [港股使用客户端年份过滤]")
         else:
@@ -424,7 +443,8 @@ def main():
 
         downloaded = download_reports(
             stock_info['code'], stock_info['orgId'], plate,
-            dir_name, searchkey, stock_save_dir, report_type, year=year
+            dir_name, searchkey, stock_save_dir, report_type, year=year,
+            fallback_searchkey=fallback_searchkey
         )
         print(f"分类 {cat_name} 下载完成: {downloaded} 个文件")
         total_downloaded += downloaded
