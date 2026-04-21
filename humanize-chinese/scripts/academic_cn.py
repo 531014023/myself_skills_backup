@@ -24,6 +24,29 @@ except ImportError:
     except ImportError:
         ngram_analyze = None
 
+# Import general detector so --compare can show both academic and general AIGC scores.
+# Users comparing to CNKI/VIP-style detectors care about the general score, not the
+# academic-specific weighted one.
+try:
+    from detect_cn import detect_patterns as _general_detect
+    from detect_cn import calculate_score as _general_score
+except ImportError:
+    try:
+        from scripts.detect_cn import detect_patterns as _general_detect
+        from scripts.detect_cn import calculate_score as _general_score
+    except ImportError:
+        _general_detect = None
+        _general_score = None
+
+
+def _compute_general_score(text):
+    """Run general detect_cn on text, return (score, issues, metrics) or (None, None, None)."""
+    if _general_detect is None or _general_score is None:
+        return None, None, None
+    g_issues, g_metrics = _general_detect(text)
+    g_score = _general_score(g_issues, g_metrics)
+    return g_score, g_issues, g_metrics
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PATTERNS_FILE = os.path.join(SCRIPT_DIR, 'patterns_cn.json')
 
@@ -183,6 +206,57 @@ def char_entropy(text):
     return entropy
 
 
+def topic_diffusion(text):
+    """
+    扩散度: measures how much topic content shifts across paragraphs.
+
+    Implementation: for each paragraph, extract top-20 bigrams as its topic
+    signature. Compute mean Jaccard similarity between consecutive paragraphs.
+    Diffusion = 1 - mean_similarity.
+
+    Interpretation:
+      - Low diffusion (< 0.3): topics repeat heavily across paragraphs
+        → template-y / AI-generated "elaborate the same point 5 times" pattern
+      - High diffusion (> 0.7): topics shift naturally → human-like
+
+    Returns tuple (diffusion_score, n_paragraphs_used).
+    """
+    paragraphs = [p.strip() for p in text.split('\n') if p.strip() and len(p.strip()) > 20]
+    if len(paragraphs) < 2:
+        return 1.0, len(paragraphs)
+
+    def signature(para):
+        chars = re.findall(r'[\u4e00-\u9fff]', para)
+        if len(chars) < 10:
+            return set()
+        bigrams = {}
+        for i in range(len(chars) - 1):
+            bg = chars[i] + chars[i + 1]
+            bigrams[bg] = bigrams.get(bg, 0) + 1
+        # Top-20 by frequency
+        top = sorted(bigrams.items(), key=lambda x: -x[1])[:20]
+        return {bg for bg, _ in top}
+
+    sigs = [signature(p) for p in paragraphs]
+    sigs = [s for s in sigs if s]
+    if len(sigs) < 2:
+        return 1.0, len(sigs)
+
+    # Mean Jaccard similarity across consecutive paragraph pairs
+    sims = []
+    for i in range(len(sigs) - 1):
+        a, b = sigs[i], sigs[i + 1]
+        union = a | b
+        inter = a & b
+        if not union:
+            continue
+        sims.append(len(inter) / len(union))
+    if not sims:
+        return 1.0, len(sigs)
+    mean_sim = sum(sims) / len(sims)
+    return 1.0 - mean_sim, len(sigs)
+
+
 # ═══════════════════════════════════════════════════════════════════
 #  Detection Engine — 10 Dimensions
 # ═══════════════════════════════════════════════════════════════════
@@ -198,6 +272,7 @@ DIMENSION_WEIGHTS = {
     'over_enumeration':      5,   # 过度列举
     'perfect_conclusion':    6,   # 结论过于圆满
     'certainty_overuse':     7,   # 语气过于确定
+    'low_topic_diffusion':   5,   # 扩散度低（知网 5 维之一）
     # Statistical dimensions (n-gram perplexity)
     'stat_low_perplexity':   0,   # scored separately
     'stat_low_burstiness':   0,   # scored separately
@@ -206,8 +281,11 @@ DIMENSION_WEIGHTS = {
 
 # Statistical feature weights (contribute up to ~25% of final score)
 STATISTICAL_WEIGHTS = {
+    'stat_low_sentence_length_cv': 14,        # HC3 d=1.22 (cycle 5)
+    'stat_low_short_sentence_fraction': 12,   # HC3 d=1.21 (cycle 5)
     'stat_low_perplexity': 12,
     'stat_low_burstiness': 10,
+    'stat_low_comma_density': 8,              # HC3 d=-0.47 (cycle 7)
     'stat_uniform_entropy': 8,
 }
 
@@ -353,6 +431,16 @@ def detect_academic(text):
                 'text': f'确定性表述 {certain_count} 次，完全缺少学术犹豫语',
                 'severity': 'medium'})
 
+    # ── 11. 扩散度 (topic diffusion across paragraphs — 知网 5 维之一) ──
+    # Human academic writing evolves topics; AI text repeats same concepts across
+    # paragraphs with only paraphrasing. Low diffusion = stuck on one topic.
+    if len(paragraphs) >= 3 and char_count >= 300:
+        diffusion, n_used = topic_diffusion(text)
+        if n_used >= 3 and diffusion < 0.5:
+            issues['low_topic_diffusion'].append({
+                'text': f'段落扩散度 {diffusion:.2f}（< 0.5，段间主题重叠过高）',
+                'severity': 'medium' if diffusion > 0.35 else 'high'})
+
     # ── 11. 统计特征：N-gram 困惑度 ──
     ngram_stats = None
     if ngram_analyze and char_count >= 100:
@@ -375,6 +463,26 @@ def detect_academic(text):
             ent_cv = ngram_stats['entropy_cv']
             issues['stat_uniform_entropy'].append({
                 'text': f'段落熵变异系数 {ent_cv:.3f}（段落间复杂度过于一致）',
+                'severity': 'statistical'})
+
+        # Cycle 5 strong indicators — sentence-length burstiness
+        if indicators.get('low_sentence_length_cv'):
+            sl = ngram_stats.get('sent_len', {})
+            issues['stat_low_sentence_length_cv'].append({
+                'text': f'句长变异系数 {sl.get("cv", 0):.2f}（句子长度过于均匀）',
+                'severity': 'statistical'})
+
+        if indicators.get('low_short_sentence_fraction'):
+            sl = ngram_stats.get('sent_len', {})
+            issues['stat_low_short_sentence_fraction'].append({
+                'text': f'短句占比 {sl.get("short_frac", 0):.1%}（几乎无 10 字以内短句）',
+                'severity': 'statistical'})
+
+        # Cycle 7 — low comma density
+        if indicators.get('low_comma_density'):
+            pc = ngram_stats.get('punct', {})
+            issues['stat_low_comma_density'].append({
+                'text': f'逗号密度 {pc.get("comma_density", 0):.2f}/百字（句内停顿偏少）',
                 'severity': 'statistical'})
 
     # ── Metrics ──
@@ -421,16 +529,17 @@ def calculate_academic_score(issues):
             sev_mult = {'critical': 1.5, 'high': 1.0, 'medium': 0.6, 'low': 0.3}.get(sev, 0.6)
             raw += weight * sev_mult * min(count, 5)
     
-    # Rule-based score (cap at ~75 points)
-    rule_score = min(75, int(raw * 0.7))
-    
-    # Statistical score (up to 25 points)
+    # Rule-based score (cap at 60 — A-path 2026-04-19 cycle 20)
+    rule_score = min(60, int(raw * 0.7))
+
+    # Statistical score (cap 40 — raised from 25 after HC3 measurement showed
+    # uncapped stat Cohen's d = 1.695, cap=25 was clipping 90% of AI signal).
     stat_score = 0
     for dim, items in issues.items():
         if dim.startswith('stat_') and items:
             stat_score += STATISTICAL_WEIGHTS.get(dim, 5)
-    stat_score = min(25, stat_score)
-    
+    stat_score = min(40, stat_score)
+
     return min(100, rule_score + stat_score)
 
 
@@ -574,23 +683,36 @@ _USE_STATS = True
 
 
 def pick_best_replacement(sentence, old, candidates):
-    """从多个候选替换中选 perplexity 最高的（最不可预测 = 最像人写的）。
-    当 _USE_STATS 关闭、ngram_analyze 不可用、或只有单候选时回退到 random.choice。"""
-    if not _USE_STATS or not ngram_analyze or len(candidates) <= 1:
-        return random.choice(candidates)
+    """从多个候选替换中挑选。
 
-    best_candidate = candidates[0]
-    best_ppl = 0
+    原策略：选 perplexity 最高的（最不可预测）。实测发现会偏向最离谱的候选。
+    新策略：按 ppl 升序排序，取「次高」（n>=3 时 index n-2，即非极端值）。
 
+    Perf: we only need PERPLEXITY to rank candidates, NOT the full analyze_text
+    (burstiness/entropy_cv/diveye/gltr are irrelevant for single-phrase ranking).
+    Using compute_perplexity() directly drops 10k-char academic humanize time from
+    ~30s to <5s (profiler showed analyze_text was 99% of hot path).
+    """
+    if not _USE_STATS or not candidates or len(candidates) <= 1:
+        return random.choice(candidates) if candidates else ''
+
+    try:
+        from ngram_model import compute_perplexity
+    except ImportError:
+        from scripts.ngram_model import compute_perplexity
+
+    scored = []
     for candidate in candidates:
         new_sentence = sentence.replace(old, candidate, 1)
-        stats = ngram_analyze(new_sentence)
-        ppl = stats.get('perplexity', 0)
-        if ppl > best_ppl:
-            best_ppl = ppl
-            best_candidate = candidate
+        # Only perplexity (no window_size → skip window perplexities). Faster than analyze_text.
+        ppl_result = compute_perplexity(new_sentence, window_size=0)
+        scored.append((candidate, ppl_result.get('perplexity', 0)))
 
-    return best_candidate
+    scored.sort(key=lambda x: x[1])  # ascending
+    n = len(scored)
+    if n <= 2:
+        return scored[-1][0]
+    return scored[n - 2][0]
 
 
 def _compute_burstiness(text):
@@ -664,7 +786,7 @@ def _inject_hedging(text, aggressive=False):
     result_paragraphs = []
     injected = 0
     total_sents = len(split_sentences(text))
-    max_inject = max(2, total_sents // 8) if not aggressive else max(3, total_sents // 5)
+    max_inject = max(3, total_sents // 5) if not aggressive else max(3, total_sents // 4)
 
     for para in paragraphs:
         sentences = split_sentences(para)
@@ -683,7 +805,7 @@ def _inject_hedging(text, aggressive=False):
                             sent = sent.replace(cm, hedge, 1)
                             injected += 1
                             break
-            elif not has_hedging and random.random() < (0.08 if not aggressive else 0.15) and injected < max_inject:
+            elif not has_hedging and random.random() < (0.14 if not aggressive else 0.15) and injected < max_inject:
                 # Don't inject hedging right after structural words
                 skip_starters = ['首先', '其次', '最后', '第一', '第二', '第三']
                 starts_structural = any(sent.strip().startswith(s) for s in skip_starters)
@@ -708,7 +830,7 @@ def _add_author_voice(text, aggressive=False):
     (after period, newline, or at the very beginning)."""
     impersonal = ['研究表明', '研究发现', '研究显示', '研究指出', '分析表明']
     replaced = 0
-    max_replace = 3 if not aggressive else 5
+    max_replace = 5 if not aggressive else 6
 
     for phrase in impersonal:
         # Only replace at natural sentence boundaries
@@ -772,7 +894,7 @@ def _reduce_connectors(text, aggressive=False):
     # Only remove some, not all — keep academic coherence
     removable = ['此外，', '另外，', '与此同时，', '不仅如此，', '事实上，', '实际上，']
     removed = 0
-    max_remove = 3 if not aggressive else 6
+    max_remove = 6 if not aggressive else 7
 
     for conn in removable:
         while conn in text and removed < max_remove:
@@ -890,7 +1012,7 @@ def humanize_academic(text, aggressive=False, seed=None):
         except ImportError:
             deep_restructure = None
     if deep_restructure:
-        text = deep_restructure(text, aggressive=aggressive)
+        text = deep_restructure(text, aggressive=aggressive, scene='academic')
 
     # 2. Reduce connector density
     text = _reduce_connectors(text, aggressive)
@@ -914,17 +1036,20 @@ def humanize_academic(text, aggressive=False, seed=None):
     text = _add_limitation_markers(text, aggressive)
 
     # ── NEW: Three perplexity-boosting strategies ──
-    
+
     # Strategy 1: Low-frequency bigram injection (always active)
+    # scene='academic' filters ACADEMIC_PRESERVE_WORDS (研究/系统/应用 etc.) and
+    # ACADEMIC_BLACKLIST_CANDIDATES (施用/本事/拉高 etc.) to keep the output readable
+    # as an academic paper.
     if reduce_high_freq_bigrams:
-        bigram_strength = 0.5 if aggressive else 0.3
-        text = reduce_high_freq_bigrams(text, strength=bigram_strength)
-    
+        bigram_strength = 0.5 if aggressive else 0.45
+        text = reduce_high_freq_bigrams(text, strength=bigram_strength, scene='academic')
+
     # Strategy 2 & 3: Noise injection (skipped with --no-noise)
     if _USE_NOISE:
         # Strategy 3: Noise expression injection (academic style — restrained)
         if inject_noise_expressions:
-            noise_density = 0.2 if aggressive else 0.1
+            noise_density = 0.2 if aggressive else 0.18
             text = inject_noise_expressions(text, density=noise_density, style='academic')
         
         # Strategy 2: Sentence length randomization
@@ -948,26 +1073,43 @@ def humanize_academic(text, aggressive=False, seed=None):
     text = re.sub(r'([\u4e00-\u9fff]{4,12})\1', r'\1', text)
 
     # ── Final verification loop (stats-optimized) ──
+    # Run per-paragraph so \n\n survives. The previous implementation used
+    # split_sentences which splits on [。！？\n] and the following ''.join() ate all
+    # paragraph breaks, collapsing the 5-paragraph input into one blob.
     if _USE_STATS and ngram_analyze:
         stats = ngram_analyze(text)
         ppl = stats.get('perplexity', 0)
-        if 0 < ppl < 200 and count_chinese(text) >= 100:
-            sentences = split_sentences(text)
-            sent_scores = []
-            for i, s in enumerate(sentences):
-                if count_chinese(s) < 5:
-                    continue
-                s_stats = ngram_analyze(s)
-                sent_scores.append((i, s_stats.get('perplexity', 0)))
+        if 0 < ppl < 350 and count_chinese(text) >= 100:
+            sorted_phrases = sorted(ACADEMIC_REPLACEMENTS.keys(), key=len, reverse=True)
 
-            if sent_scores:
+            def _fix_paragraph(para, rng_seed):
+                # Split on sentence punctuation only, keeping delimiters.
+                parts = re.split(r'([。！？])', para)
+                sentences = []
+                for i in range(0, len(parts) - 1, 2):
+                    s = parts[i]
+                    p = parts[i + 1] if i + 1 < len(parts) else ''
+                    if s.strip():
+                        sentences.append(s + p)
+                if len(parts) % 2 == 1 and parts[-1].strip():
+                    sentences.append(parts[-1])
+
+                sent_scores = []
+                for i, s in enumerate(sentences):
+                    if count_chinese(s) < 5:
+                        continue
+                    s_stats = ngram_analyze(s)
+                    sent_scores.append((i, s_stats.get('perplexity', 0)))
+
+                if not sent_scores:
+                    return para
+
                 sent_scores.sort(key=lambda x: x[1])
-                n_fix = min(5, max(1, len(sent_scores) // 5))
+                n_fix = min(3, max(1, len(sent_scores) // 5))
 
-                if seed is not None:
-                    random.seed(seed + 1)
+                if rng_seed is not None:
+                    random.seed(rng_seed)
 
-                sorted_phrases = sorted(ACADEMIC_REPLACEMENTS.keys(), key=len, reverse=True)
                 for idx, _ in sent_scores[:n_fix]:
                     sent = sentences[idx]
                     for phrase in sorted_phrases:
@@ -978,8 +1120,15 @@ def humanize_academic(text, aggressive=False, seed=None):
                             best = pick_best_replacement(sent, phrase, alternatives)
                             sentences[idx] = sent.replace(phrase, best, 1)
                             break
+                return ''.join(sentences)
 
-                text = ''.join(sentences)
+            paragraphs = text.split('\n\n')
+            seed_base = seed + 1 if seed is not None else None
+            fixed = [
+                _fix_paragraph(p, seed_base + i if seed_base is not None else None)
+                for i, p in enumerate(paragraphs)
+            ]
+            text = '\n\n'.join(fixed)
 
     return text.strip()
 
@@ -999,6 +1148,7 @@ DIMENSION_NAMES = {
     'over_enumeration':      ('🟡', '过度列举'),
     'perfect_conclusion':    ('🟠', '结论过于圆满'),
     'certainty_overuse':     ('🟠', '语气过于确定'),
+    'low_topic_diffusion':   ('🟠', '扩散度低（主题重叠）'),
     # Statistical features
     'stat_low_perplexity':   ('📊', '困惑度异常低'),
     'stat_low_burstiness':   ('📊', '困惑度变化均匀'),
@@ -1046,6 +1196,7 @@ def format_detect_output(issues, metrics, score, as_json=False, score_only=False
         'ai_academic_phrases', 'passive_overuse', 'paragraph_uniformity',
         'connector_density', 'synonym_poverty', 'citation_integration',
         'data_template', 'over_enumeration', 'perfect_conclusion', 'certainty_overuse',
+        'low_topic_diffusion',
         'stat_low_perplexity', 'stat_low_burstiness', 'stat_uniform_entropy',
     ]
     for dim in dim_order:
@@ -1072,8 +1223,15 @@ def format_detect_output(issues, metrics, score, as_json=False, score_only=False
 
 
 def format_comparison(before_issues, before_metrics, before_score,
-                      after_issues, after_metrics, after_score):
-    """Format before/after comparison."""
+                      after_issues, after_metrics, after_score,
+                      before_general=None, after_general=None):
+    """Format before/after comparison.
+
+    before_general / after_general: tuple (score, level) from detect_cn, or None.
+    When both are provided, the general score is displayed alongside the academic one —
+    this matters because users optimizing for CNKI/VIP-style detectors care about the
+    general score, not the academic-specific weighted one (which uses a 0.7 multiplier).
+    """
     lines = []
     b_level = score_to_level(before_score)
     a_level = score_to_level(after_score)
@@ -1082,16 +1240,35 @@ def format_comparison(before_issues, before_metrics, before_score,
     a_bar = '█' * int(after_score / 100 * 20) + '░' * (20 - int(after_score / 100 * 20))
 
     lines.append('═══ 学术 AIGC 对比结果 ═══\n')
-    lines.append(f'原文:   {before_score:3d}/100 [{b_bar}] {b_level.upper().replace("_"," ")}')
-    lines.append(f'改写后: {after_score:3d}/100 [{a_bar}] {a_level.upper().replace("_"," ")}')
+    lines.append('学术专用评分 (10 维度，含 ×0.7 权重):')
+    lines.append(f'  原文:   {before_score:3d}/100 [{b_bar}] {b_level.upper().replace("_"," ")}')
+    lines.append(f'  改写后: {after_score:3d}/100 [{a_bar}] {a_level.upper().replace("_"," ")}')
 
     diff = before_score - after_score
     if diff > 0:
-        lines.append(f'\n✅ 降低了 {diff} 分')
+        lines.append(f'  ✅ 降低了 {diff} 分')
     elif diff == 0:
-        lines.append(f'\n⚠️  分数未变化')
+        lines.append(f'  ⚠️  分数未变化')
     else:
-        lines.append(f'\n❌ 分数上升了 {abs(diff)} 分')
+        lines.append(f'  ❌ 分数上升了 {abs(diff)} 分')
+
+    # General AIGC score (same scoring function as detect_cn.py)
+    if before_general is not None and after_general is not None:
+        g_before, g_before_lvl = before_general
+        g_after, g_after_lvl = after_general
+        g_b_bar = '█' * int(g_before / 100 * 20) + '░' * (20 - int(g_before / 100 * 20))
+        g_a_bar = '█' * int(g_after / 100 * 20) + '░' * (20 - int(g_after / 100 * 20))
+        lines.append('')
+        lines.append('通用 AIGC 评分 (同 detect_cn.py，更接近 CNKI/VIP 风格检测器):')
+        lines.append(f'  原文:   {g_before:3d}/100 [{g_b_bar}] {g_before_lvl.upper().replace("_"," ")}')
+        lines.append(f'  改写后: {g_after:3d}/100 [{g_a_bar}] {g_after_lvl.upper().replace("_"," ")}')
+        g_diff = g_before - g_after
+        if g_diff > 0:
+            lines.append(f'  ✅ 降低了 {g_diff} 分')
+        elif g_diff == 0:
+            lines.append(f'  ⚠️  分数未变化')
+        else:
+            lines.append(f'  ❌ 分数上升了 {abs(g_diff)} 分')
 
     # Dimension breakdown
     all_dims = set(list(before_issues.keys()) + list(after_issues.keys()))
@@ -1147,16 +1324,19 @@ def main():
                        help='跳过统计优化（困惑度反馈），回退到纯规则替换')
     parser.add_argument('--no-noise', action='store_true',
                        help='跳过噪声策略（句长随机化 + 噪声表达插入）')
+    parser.add_argument('--quick', action='store_true',
+                       help='快速模式（= --no-stats --no-noise），只跑短语替换 + 结构清理，'
+                            '长文本 <1s，适合先粗过一遍看大概效果')
 
     args = parser.parse_args()
 
     # Toggle stats optimization
     global _USE_STATS
-    _USE_STATS = not args.no_stats
+    _USE_STATS = not (args.no_stats or args.quick)
 
     # Toggle noise strategies
     global _USE_NOISE
-    _USE_NOISE = not args.no_noise
+    _USE_NOISE = not (args.no_noise or args.quick)
 
     # Read input
     if args.file:
@@ -1188,10 +1368,18 @@ def main():
     humanized = humanize_academic(text, aggressive=args.aggressive, seed=args.seed)
 
     if args.compare:
-        # Run detection on humanized text
+        # Run both academic and general detection on humanized text
         after_issues, after_metrics = detect_academic(humanized)
         after_score = calculate_academic_score(after_issues)
-        print(format_comparison(issues, metrics, score, after_issues, after_metrics, after_score))
+        # General AIGC scores (same scoring as detect_cn.py, more predictive of CNKI/VIP)
+        before_general = after_general = None
+        g_before, _, _ = _compute_general_score(text)
+        g_after, _, _ = _compute_general_score(humanized)
+        if g_before is not None and g_after is not None:
+            before_general = (g_before, score_to_level(g_before))
+            after_general = (g_after, score_to_level(g_after))
+        print(format_comparison(issues, metrics, score, after_issues, after_metrics, after_score,
+                                before_general=before_general, after_general=after_general))
 
     # Save output
     if args.output:
@@ -1201,15 +1389,24 @@ def main():
         print(f'✓ 已保存到 {args.output}{mode}')
 
         if not args.compare:
-            # Quick score comparison
+            # Quick score comparison — report academic + general scores side by side
             after_issues, after_metrics = detect_academic(humanized)
             after_score = calculate_academic_score(after_issues)
             diff = score - after_score
-            print(f'  原文评分: {score}/100 → 改写后: {after_score}/100', end='')
+            print(f'  学术专用: {score}/100 → {after_score}/100', end='')
             if diff > 0:
-                print(f'  ✅ 降低了 {diff} 分')
+                print(f'  (降 {diff})')
             else:
                 print()
+            g_before, _, _ = _compute_general_score(text)
+            g_after, _, _ = _compute_general_score(humanized)
+            if g_before is not None and g_after is not None:
+                g_diff = g_before - g_after
+                print(f'  通用评分: {g_before}/100 → {g_after}/100', end='')
+                if g_diff > 0:
+                    print(f'  (降 {g_diff})')
+                else:
+                    print()
     else:
         # No output file, no compare — print humanized text
         print(humanized)
