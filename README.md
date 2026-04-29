@@ -1,6 +1,6 @@
 # Claude Skills 技能库
 
-> 本目录包含 54 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
+> 本目录包含 55 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
 
 ---
 
@@ -26,6 +26,7 @@
 | [stock-research-engine](./stock-research-engine) | 个股研究引擎 | 买方基金经理视角的个股深度研究。覆盖A股/港股/美股，输出投资分析简报（含市场情绪、基本面、管理层、估值等） |
 | [cninfo-annual-download](./cninfo-annual-download) | 年报下载器 | 巨潮资讯网年报下载器。支持A股（沪/深/北交所）和港股的年报、半年报、季报等定期报告下载 |
 | [annual-report-extractor](./annual-report-extractor) | 年报数据提取 | 从年报PDF中提取数值型财务数据和产能数据。支持任意字段自动适配，输出CSV格式 |
+| [cai-bao-pai-lei-v2](./cai-bao-pai-lei-v2) | 财报排雷v2 | 基于唐朝《手把手教你读财报》方法论的财报排雷分析。支持A股/港股/美股，38条疑点规则库，强制六步疑点排查流程 |
 
 ### 三、文档处理（8个）
 
