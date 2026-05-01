@@ -63,9 +63,9 @@ def _build_templates():
         ]
     ))
 
-    # ── 5. X对Y具有Z意义 ──
+    # ── 5. X对Y具有Z意义 ── (negative lookahead on 于 to avoid "对于" split)
     templates.append((
-        re.compile(r'(?P<X>[^，,。]{2,15})对(?P<Y>[^，,。]{2,12})具有(?P<Z>[^，,。]{1,10})意义'),
+        re.compile(r'(?P<X>[^，,。]{2,15})对(?!于)(?P<Y>[^，,。]{2,12})具有(?P<Z>[^，,。]{1,10})意义'),
         [
             lambda m: f'从{m.group("Y")}的角度看，{m.group("X")}的{m.group("Z")}意义值得关注',
             lambda m: f'{m.group("X")}之于{m.group("Y")}，有着{m.group("Z")}意义',
@@ -73,19 +73,25 @@ def _build_templates():
     ))
 
     # ── 6. X能够根据Y，Z ──
+    # Previous alt '{X}可以{Z}' doubled 以 when Z starts with 以 ('以应对'
+    # is a frequent idiom suffix). '{X}就能{Z}' avoids the boundary clash
+    # and keeps the same modal sense.
     templates.append((
         re.compile(r'(?P<X>[^，,。]{2,15})能够根据(?P<Y>[^，,。]{2,20})[，,]\s*(?P<Z>[^。！？]{2,25})'),
         [
-            lambda m: f'根据{m.group("Y")}，{m.group("X")}可以{m.group("Z")}',
+            lambda m: f'根据{m.group("Y")}，{m.group("X")}就能{m.group("Z")}',
             lambda m: f'{m.group("X")}会参考{m.group("Y")}来{m.group("Z")}',
         ]
     ))
 
     # ── 7. X为Y提供了Z ──
+    # Previous prefix '在{X}的支持下' doubled 在 when X starts with 在
+    # ('在线学习平台' → '在在线学习平台'). '依托' has no leading char
+    # that would clash with substrings X might start with.
     templates.append((
         re.compile(r'(?P<X>[\u4e00-\u9fff]{2,12})为(?P<Y>[\u4e00-\u9fff]{2,10})提供了(?P<Z>[\u4e00-\u9fff]{2,15})'),
         [
-            lambda m: f'在{m.group("X")}的支持下，{m.group("Y")}获得了{m.group("Z")}',
+            lambda m: f'依托{m.group("X")}，{m.group("Y")}获得了{m.group("Z")}',
         ]
     ))
 
@@ -133,11 +139,15 @@ def _build_templates():
         ]
     ))
 
-    # ── 13. X是Y的重要/关键Z ──
+    # ── 13. X是Y的重要/关键Z ── (W bounded by commas to avoid crossing clauses)
+    # W's last character is unconstrained, so any template suffix that starts
+    # with 地 (e.g. '地位') will double when W itself ends in 地 ('核心阵地'
+    # → '阵地地位'). Use suffixes that don't share their first char with
+    # common Z+W endings.
     templates.append((
-        re.compile(r'(?P<X>[^，,。]{2,15})是(?P<Y>[^，,。]{2,12})的(?P<Z>重要|关键|核心|主要)(?P<W>[^。！？]{1,8})'),
+        re.compile(r'(?P<X>[^，,。]{2,15})是(?P<Y>[^，,。]{2,12})的(?P<Z>重要|关键|核心|主要)(?P<W>[^，,。！？]{1,5})'),
         [
-            lambda m: f'对于{m.group("Y")}来说，{m.group("X")}的{m.group("W")}地位{m.group("Z").replace("重要","不可小觑").replace("关键","至关重要").replace("核心","居于核心").replace("主要","相当突出")}',
+            lambda m: f'就{m.group("Y")}而言，{m.group("X")}作为{m.group("W")}{m.group("Z").replace("重要","举足轻重").replace("关键","至关重要").replace("核心","不可或缺").replace("主要","相当突出")}',
         ]
     ))
 
@@ -159,9 +169,9 @@ def _build_templates():
         ]
     ))
 
-    # ── 16. X对Y产生了重要影响 ──
+    # ── 16. X对Y产生了重要影响 ── (negative lookahead on 于)
     templates.append((
-        re.compile(r'(?P<X>[^，,。]{2,15})对(?P<Y>[^，,。]{2,12})产生了(?:重要|深远|显著|明显)?影响'),
+        re.compile(r'(?P<X>[^，,。]{2,15})对(?!于)(?P<Y>[^，,。]{2,12})产生了(?:重要|深远|显著|明显)?影响'),
         [
             lambda m: f'{m.group("X")}对{m.group("Y")}的影响不容忽视',
             lambda m: f'{m.group("Y")}受到{m.group("X")}的牵动',
@@ -518,27 +528,37 @@ def split_long_sentences(text):
             result.append(segment)
             continue
 
+        # Paragraph guard: skip splits whose match span includes a \n\n
+        # boundary, AND preserve any segment content before/after the match
+        # span — older code replaced the entire segment with
+        # f"{before}。{after}", silently dropping leading "\n\n###
+        # header\n\n- bullet:" prefixes. Sample 608 of longform corpus
+        # collapsed 13 paragraphs to 11 from this. Same family of bug as
+        # the cycle-1 humanize_cn .strip() fix.
         # 尝试在"不仅...还/也"处拆分
         # before 必须是短的无内部逗号的主语（2-10 中文字），否则拆分会把整段复制。
         # 例：避免 "智能评估系统能够多维度地评判学生的综合素质，不仅..." 被当作 before 整段复制。
         m = re.search(r'(?P<before>[\u4e00-\u9fff]{2,10})不仅(?P<A>[^，,。]{2,25})[，,]\s*(?:还|也|更)(?P<B>.+)', segment)
-        if m and random.random() < 0.5:
+        if m and random.random() < 0.5 and '\n\n' not in m.group(0):
             # 确认 match 起始就是 before（即 before 前面没有其它句子内容，是真正的主语位）
             if m.start() == 0 or segment[m.start() - 1] in '，。！？':
                 subj = m.group('before').strip()
-                result.append(f'{subj}不仅{m.group("A")}。{subj}{m.group("B").strip()}')
+                replaced = f'{subj}不仅{m.group("A")}。{subj}{m.group("B").strip()}'
+                result.append(segment[:m.start()] + replaced + segment[m.end():])
                 continue
 
         # 尝试在"，同时/并且/而且"处拆分
         m = re.search(r'(?P<before>.+?)[，,]\s*(?:同时|并且|而且)(?P<after>.+)', segment)
-        if m and cn_len > 30 and random.random() < 0.4:
-            result.append(f'{m.group("before").strip()}。{m.group("after").strip()}')
+        if m and cn_len > 30 and random.random() < 0.4 and '\n\n' not in m.group(0):
+            replaced = f'{m.group("before").strip()}。{m.group("after").strip()}'
+            result.append(segment[:m.start()] + replaced + segment[m.end():])
             continue
 
         # 尝试在"，从而/进而"处拆分
         m = re.search(r'(?P<before>.+?)[，,]\s*(?:从而|进而)(?P<after>.+)', segment)
-        if m and cn_len > 30 and random.random() < 0.4:
-            result.append(f'{m.group("before").strip()}。这样一来，{m.group("after").strip()}')
+        if m and cn_len > 30 and random.random() < 0.4 and '\n\n' not in m.group(0):
+            replaced = f'{m.group("before").strip()}。这样一来，{m.group("after").strip()}'
+            result.append(segment[:m.start()] + replaced + segment[m.end():])
             continue
 
         result.append(segment)
@@ -742,6 +762,15 @@ def remove_ai_fillers(text, delete_prob=0.5):
         matches = list(re.finditer(pattern, text))
         for m in reversed(matches):  # 从后往前删，避免位移
             if random.random() < delete_prob:
+                # Word-boundary doubling guard: deletion can collapse the
+                # left context onto the right context. If the char before
+                # the filler equals the first char after it, deleting would
+                # produce a doubled char ("尤其值得一提的是，其自主研发"
+                # → "尤其其自主研发"). Skip deletion in that case.
+                left_ch = text[m.start() - 1:m.start()] if m.start() > 0 else ''
+                right_ch = text[m.end():m.end() + 1]
+                if left_ch and left_ch == right_ch:
+                    continue
                 text = text[:m.start()] + text[m.end():]
 
     return text
@@ -864,6 +893,13 @@ def boost_comma_density(text, target=4.7):
             tail_prefix = prefix[-6:] if len(prefix) > 6 else prefix
             if '，' in tail_prefix or ',' in tail_prefix:
                 continue
+            # Skip if prefix ends in a negation/modal that binds tightly to
+            # the marker verb. Covers 不X (不再/不会/不能), 没X, 未X, 别X,
+            # 仍X, 还X, 再X, 才X, 都X etc. Check last two chars so 不再需要
+            # (where char before 需要 is 再) is caught.
+            tail2 = prefix[-2:] if len(prefix) >= 2 else prefix
+            if any(c in '不未没别仍还再才都也' for c in tail2):
+                continue
             # Don't insert at very end either (need some stuff after)
             suffix_cn = sum(1 for c in sent[idx:] if '\u4e00' <= c <= '\u9fff')
             if suffix_cn < 4:
@@ -877,7 +913,24 @@ def boost_comma_density(text, target=4.7):
     return ''.join(out)
 
 
-def insert_short_reactions(text, target_short_frac=0.15, max_per_paragraph=1, seed=None, min_sentences=3, scene='general'):
+def _dialogue_density(text):
+    """Fraction of chars inside quoted dialogue. AI novels use a mix of
+    curly U+201C/D (“”), corner U+300C/D (「」), and ASCII " pairs
+    depending on model. Threshold 0.08 flags narrative text."""
+    n = 0
+    for p in (r'“[^“”]{3,}?”', r'「[^「」]{3,}?」'):
+        for m in re.findall(p, text):
+            n += len(m)
+    # ASCII " pairs: split, odd-indexed segments are inside quotes
+    parts = text.split('"')
+    if len(parts) >= 3:
+        for i in range(1, len(parts), 2):
+            if len(parts[i]) >= 3:
+                n += len(parts[i])
+    return n / max(1, len(text))
+
+
+def insert_short_reactions(text, target_short_frac=None, max_per_paragraph=1, seed=None, min_sentences=3, scene='general'):
     """Inject short reaction sentences at paragraph seams where short_frac is low.
 
     Only injects when:
@@ -896,14 +949,26 @@ def insert_short_reactions(text, target_short_frac=0.15, max_per_paragraph=1, se
     """
     if seed is not None:
         random.seed(seed)
+    # Narrative guard: "颇有道理/事出有因" reactions fit essay/opinion text but
+    # are jarring in fiction with heavy dialogue. Skip when dialogue density
+    # is high. Threshold 0.08 matches novel/review register without blocking
+    # essay-style text that happens to quote a source.
+    if _dialogue_density(text) >= 0.08:
+        return text
+    if target_short_frac is None:
+        target_short_frac = 0.22 if scene == 'academic' else 0.15
     paragraphs = text.split('\n\n')
+    # Track reactions already inserted in this text. Without dedupe a sample
+    # with many paragraphs can land "事出有因" 5 times (sample 16 audit) when
+    # random.choice happens to cluster — reads as an obvious AI tic.
+    used = set()
     return '\n\n'.join(
-        _insert_reactions_in_paragraph(p, target_short_frac, max_per_paragraph, min_sentences, scene)
+        _insert_reactions_in_paragraph(p, target_short_frac, max_per_paragraph, min_sentences, scene, used)
         for p in paragraphs
     )
 
 
-def _insert_reactions_in_paragraph(p, target, max_per, min_sentences=3, scene='general'):
+def _insert_reactions_in_paragraph(p, target, max_per, min_sentences=3, scene='general', used=None):
     parts = re.split(r'([。！？])', p)
     sentences = []
     i = 0
@@ -944,7 +1009,27 @@ def _insert_reactions_in_paragraph(p, target, max_per, min_sentences=3, scene='g
         gap = max(0.0, target - current_short_frac)
         prob = min(0.85, 0.35 + gap * 3.0)
     if random.random() < prob:
-        reaction = random.choice(_SHORT_REACTIONS_NEUTRAL)
+        if used is not None:
+            avail = [r for r in _SHORT_REACTIONS_NEUTRAL if r not in used]
+            if not avail:
+                avail = _SHORT_REACTIONS_NEUTRAL  # fallback when pool exhausted
+        else:
+            avail = list(_SHORT_REACTIONS_NEUTRAL)
+        # Word-boundary doubling guard: skip reactions whose first char
+        # matches the last char of the preceding sentence ("...安全性和有"
+        # + "有一定道理" → "...和有有一定道理"). Falls back to the full
+        # avail list if filtering leaves nothing.
+        prev_last = ''
+        if sentences:
+            tail = sentences[-1].rstrip('。！？，, ')
+            prev_last = tail[-1:] if tail else ''
+        if prev_last:
+            non_doubling = [r for r in avail if r and r[0] != prev_last]
+            if non_doubling:
+                avail = non_doubling
+        reaction = random.choice(avail)
+        if used is not None:
+            used.add(reaction)
         sentences.append(reaction)
 
     return ''.join(sentences)

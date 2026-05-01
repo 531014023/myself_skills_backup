@@ -153,11 +153,17 @@ def _compute_burstiness(text):
 
 WORD_SYNONYMS = {
     # ── 逻辑连接 / 转折 ──
-    '因此': ['所以', '因而', '为此', '故而'],
-    '然而': ['不过', '但', '可是', '只是'],
-    '但是': ['不过', '可是', '只是', '然而'],
+    # Cycle 95: dropped '所以' (logic_connectors w=7 self-defeat).
+    '因此': ['因而', '为此', '故而'],
+    # Cycle 97: dropped '不过' from both — logic_connectors w=7 self-defeat.
+    '然而': ['但', '可是', '只是'],
+    # Cycle 98: dropped '然而' (logic_connectors w=7 self-defeat — replacing
+    # 但是 with 然而 just trades one detected connector for another).
+    '但是': ['可是', '只是'],
     '虽然': ['尽管', '即便', '就算', '纵然'],
-    '所以': ['因此', '因而', '故而', '于是'],
+    # Cycle 96: dropped '因此' (logic_connectors w=7 self-defeat — replacing
+    # 所以 with 因此 just trades one detected connector for another).
+    '所以': ['因而', '故而', '于是'],
     '而且': ['并且', '况且', '何况', '再说'],
     '或者': ['要么', '抑或', '或是', '还是'],
     '如果': ['倘若', '假如', '若是', '要是'],
@@ -169,15 +175,27 @@ WORD_SYNONYMS = {
     '实现': ['达成', '做到', '完成', '办到'],
     '提高': ['提升', '增强', '改善', '拉高'],
     '发展': ['推进', '进展', '演进', '推动'],
-    '影响': ['波及', '冲击', '左右', '触动'],
+    # '影响' removed: the idiom slot 「在 X 影响下」 is high-frequency in
+    # both academic and 玄幻 register, and every candidate breaks it —
+    # '波及'/'左右' are verb-only ('在...左右下' / '在...波及下' are
+    # ungrammatical), '触动' is instantaneous-emotional ('在...触动下'
+    # reads as 在...刺激下 but awkward), only '冲击' fits the slot. Same
+    # ambiguity as the historical removals of '存在' / '有效' / '发现'.
     '研究': ['探究', '考察', '审视', '钻研'],
     '表明': ['显示', '说明', '反映', '揭示'],
     '认为': ['觉得', '以为', '判断', '主张'],
     '需要': ['有必要', '须', '要', '得'],
     '使用': ['运用', '采用', '用', '动用'],
-    '具有': ['带有', '兼具', '拥有', '含有'],
+    '具有': ['带有', '拥有', '含有', '具备'],
     '导致': ['引发', '造成', '招致', '引起'],
-    '提供': ['给出', '供给', '拿出', '呈上'],
+    # Cycle 63: dropped '拿出' (physical/colloquial register).
+    # Cycle 65: dropped '供给' — '供给' carries an economics-supply sense
+    # (goods/resources), not the conceptual '提供 解释/思路/借鉴' sense.
+    # Audit on 170 samples found 76 humanize-introduced 供给 cases across
+    # all genres ("无法供给清晰的推理路径" / "供给代码示例" / "供给精神
+    # 食粮" / "供给一面思考的镜子"). Added '给予' (grant/give) which works
+    # in abstract conceptual contexts.
+    '提供': ['给出', '呈上', '给予'],
     '分析': ['剖析', '解读', '拆解', '审视'],
     '促进': ['推动', '助推', '带动', '催动'],
     '利用': ['借用', '运用', '动用', '凭借'],
@@ -190,19 +208,31 @@ WORD_SYNONYMS = {
     '减少': ['缩减', '削减', '降低', '裁减'],
     '保持': ['维持', '守住', '留住', '持续'],
     '解决': ['化解', '处置', '破解', '攻克'],
-    '改变': ['改动', '变更', '扭转', '调整'],
-    '选择': ['挑选', '择取', '选用', '拣'],
-    '支持': ['撑持', '扶持', '相挺', '力挺'],
+    '改变': ['改动', '扭转', '调整', '变化'],
+    '选择': ['挑选', '选定', '选用'],
+    '支持': ['撑持', '扶持', '支撑'],
     '组成': ['构成', '拼成', '组合', '凑成'],
     '形成': ['催生', '铸成', '生成', '酿成'],
     '获得': ['取得', '赢得', '得到', '揽获'],
     '确定': ['敲定', '锁定', '明确', '定下'],
-    '发现': ['察觉', '觉察', '识破', '看出'],
+    # '发现' removed: substring inside the 4-char idiom 案发现场 gets
+    # corrupted into '案察觉场'/'案觉察场'/'案识破场' when the word-level
+    # substitution crosses the idiom boundary. Same family of bug as '存在'
+    # / '有效' below — without proper word-boundary tagging the safe move
+    # is to drop the entry. Lost LR delta is small ('发现' is mostly used
+    # as a finite verb where surrounding 2-char windows already vary).
     '推动': ['驱动', '助推', '催动', '拉动'],
     '加强': ['强化', '增强', '夯实', '巩固'],
-    '体现': ['彰显', '凸显', '映射', '折射'],
+    # Cycle 78: dropped '彰显' / '凸显' — both are in detect_cn's
+    # ai_high_freq_words pattern (weight 6), so injecting them as humanize
+    # alts for '体现' raises the AI score (self-defeating, same family
+    # as cycles 76/77). Added '反映' which is a synonym in the same
+    # semantic neighborhood without being an AI-flagged term.
+    '体现': ['映射', '折射', '反映'],
     '满足': ['达到', '契合', '符合', '迎合'],
-    '存在': ['有', '潜伏', '隐含', '客观上有'],
+    # '存在' removed: substring matches across word boundaries like 留存+在
+    # → 留存有 which breaks the 留存 compound. Too error-prone without
+    # word-boundary awareness.
     '属于': ['归属', '算是', '属', '归入'],
     '考虑': ['斟酌', '权衡', '琢磨', '思量'],
     '处理': ['打理', '应对', '料理', '处置'],
@@ -216,13 +246,27 @@ WORD_SYNONYMS = {
     '关注': ['留意', '聚焦', '在意', '着眼'],
     '涉及': ['牵涉', '关乎', '触及', '波及'],
     '依据': ['按照', '参照', '凭', '根据'],
-    '采用': ['选用', '沿用', '取用', '引用'],
+    # Cycle 61: dropped '取用' (informal/archaic 'fetch and use').
+    # Cycle 62: dropped '引用' too — '引用' means 'cite/quote/reference',
+    # not 'adopt/employ'. Same audit found 27 hits where '采用' was
+    # substituted with '引用' in formal contexts ("引用对抗学习" / "引用
+    # 先进的5纳米制程" / "引用复式教学法") — clear semantic error: a method
+    # is adopted, not cited.
+    '采用': ['选用', '沿用'],
     # ── 副词 / 程度 ──
     '目前': ['眼下', '当前', '现阶段', '如今'],
-    '同时': ['与此同时', '此外', '另外', '并且'],
+    # Cycle 80: dropped '与此同时' — it is in detect_cn's mechanical_connectors
+    # pattern (weight 10), so substituting '同时' with '与此同时' raises the
+    # AI score (self-defeating). Pool 4→3.
+    # Cycle 80 dropped '与此同时'. Cycle 94 swap '此外'/'另外'
+    # (logic_connectors w=7 self-defeat) for '同样' / '一并' (clean).
+    '同时': ['并且', '同样', '一并'],
     '通过': ['借助', '凭借', '经由', '依靠'],
     '根据': ['按照', '依据', '参照', '依照'],
-    '有效': ['管用', '奏效', '见效', '起作用'],
+    # '有效' removed: word is often adjectival (有效证件/有效身份/有效期),
+    # and every alternative (管用/奏效/见效/起作用) is a verb/predicate that
+    # breaks attributive usage (奏效身份证件). Would need word-level POS
+    # tagging to handle safely.
     '基于': ['立足于', '依托', '以…为基础', '仰赖'],
     '对于': ['针对', '就', '关于', '面对'],
     '非常': ['极其', '十分', '很', '格外'],
@@ -230,7 +274,9 @@ WORD_SYNONYMS = {
     '完全': ['彻底', '全然', '纯粹', '压根'],
     '不断': ['持续', '始终', '一再', '反复'],
     '逐渐': ['渐渐', '慢慢', '一步步', '日渐'],
-    '主要': ['核心', '关键', '首要', '最要紧的'],
+    # '最要紧' alt removed: when source is '最主要', substitution gives
+    # '最最要紧' (doubled-最 across word boundary).
+    '主要': ['核心', '关键', '首要'],
     '一般': ['通常', '往常', '照例', '大抵'],
     '大量': ['海量', '大批', '众多', '成堆的'],
     '进一步': ['更', '再', '深入', '继续'],
@@ -241,30 +287,53 @@ WORD_SYNONYMS = {
     '必须': ['得', '务必', '非得', '须'],
     '可能': ['也许', '兴许', '或许', '大概'],
     # ── 名词 / 概念 ──
-    '重要': ['关键', '核心', '要紧', '紧要'],
-    '显著': ['明显', '突出', '可观', '醒目'],
-    '问题': ['难题', '困境', '麻烦', '症结'],
-    '方面': ['层面', '维度', '角度', '面向'],
+    # '关键' alt removed: when source is '至关重要' (4-char idiom containing
+    # '重要' as substring), substitution gives '至关关键' (doubled-关 across
+    # word boundary). Other alts ('核心', '要紧', '紧要') preserve the idiom.
+    '重要': ['核心', '要紧', '紧要'],
+    # Cycle 60: dropped '醒目' (visually striking, not degree adverb).
+    # Cycle 66: dropped '突出' too — 突出 is verb/adjective ('stick out /
+    # prominent') and doesn't work as a degree adverb. Audit found 19
+    # adverb-position substitutions where it produced register/semantic
+    # mismatch ('突出下降' / '突出高于' / '突出提升'). Replaced with '大幅',
+    # which works as adverb of degree (118 hits in human news corpus).
+    # '突出' is kept in '强调' alts where it functions as V (突出重要性).
+    '显著': ['明显', '可观', '大幅'],
+    '问题': ['难题', '麻烦', '症结'],
+    '方面': ['层面', '维度', '领域'],
     '情况': ['状况', '形势', '境况', '局面'],
     '特点': ['特征', '属性', '标志', '特色'],
-    '方法': ['办法', '手段', '途径', '招数'],
+    # Cycle 71: dropped '招数' — colloquial 'trick / move' (martial-arts
+    # connotation), wrong register for '方法' (systematic approach). Audit
+    # found 16 humanize-introduced 招数 in news/blog ("教学招数" / "学习
+    # 招数" / "教育招数论" / "工作招数" / "冲洗招数"). 招数 was already
+    # blacklisted for academic, so this drop only affects general/social/
+    # novel where it was firing inappropriately.
+    '方法': ['办法', '手段', '途径'],
     '过程': ['历程', '进程', '流程', '经过'],
-    '结果': ['后果', '成果', '产物', '结局'],
+    '结果': ['成果', '产物', '结局'],
     '条件': ['前提', '条件', '要件', '门槛'],
     '作用': ['功用', '效用', '效能', '功能'],
     '内容': ['要素', '成分', '要点', '素材'],
     '程度': ['幅度', '力度', '地步', '深浅'],
     '原因': ['缘由', '根源', '起因', '来由'],
     '目标': ['目的', '指向', '靶心', '方向'],
-    '水平': ['档次', '层次', '段位', '高度'],
+    '水平': ['档次', '层次', '高度', '水准'],
     '范围': ['领域', '地带', '区间', '覆盖面'],
     '趋势': ['走向', '苗头', '势头', '倾向'],
     '能力': ['本事', '实力', '功底', '才干'],
     '优势': ['长处', '强项', '亮点', '好处'],
-    '资源': ['资产', '家底', '储备', '本钱'],
-    '环境': ['氛围', '生态', '场景', '背景'],
+    '资源': ['物资', '储备', '要素'],
+    # '场景' alt removed: when source is '市场环境', substitution gives
+    # '市场场景' (doubled-场 across word boundary).
+    # Cycle 79: dropped '生态' — it is in detect_cn's empty_grand_words
+    # pattern (weight 12, the highest). Substituting '环境' with '生态'
+    # produces AI-buzzword uses ('AI生态' / '教育生态') that the detector
+    # immediately flags. Added '局面' / '情境' as clean alts in the same
+    # semantic neighborhood without doubled-char boundary issues.
+    '环境': ['氛围', '背景', '局面', '情境'],
     '系统': ['体系', '架构', '框架'],
-    '策略': ['打法', '路线', '方案', '对策'],
+    '策略': ['路线', '方案', '对策', '路子'],
 }
 
 # ═══════════════════════════════════════════════════════════════════
@@ -317,6 +386,29 @@ ACADEMIC_BLACKLIST_CANDIDATES = {
     '探究', '剖析',
     # 连接词口语化
     '缘于', '缘由', '来由',
+    # 因果/序列连词 - 在 academic 里 '于是' 倾向 sequential temporal sense
+    # ('then …'), 不像 '因此 / 因而' 那样表示 logical inference. Cycle 64
+    # audit found 12 academic samples with '于是 解释 / 于是 削弱 / 于是
+    # 及时干预' 等 logical 上下文里被误用. 保留给 general/novel scene.
+    '于是',
+}
+
+
+# Novel/fiction register: a subset of ACADEMIC_BLACKLIST_CANDIDATES still
+# applies to 3rd-person 玄幻/武侠/小说 prose, but several entries are
+# narrative-friendly verbs ('察觉'/'识破') that academic writing rejects yet
+# read naturally in fiction. Carve those out so novel mode keeps useful
+# perplexity-boosting substitutes while still stripping colloquial ones
+# ('搞'/'拉高'/'业已') that break narrative register.
+NOVEL_BLACKLIST_CANDIDATES = ACADEMIC_BLACKLIST_CANDIDATES - {
+    # Action/perception verbs that fiction uses freely
+    '觉察', '察觉', '识破', '看出', '拆解',
+    # 海量/眼下 are 武侠/玄幻 idioms ("海量灵气" / "眼下危机")
+    '海量', '眼下',
+    # 古风 register friendly
+    '宛若',
+    # Investigation verbs OK in narrative ("探究秘境奥秘")
+    '探究', '剖析',
 }
 
 
@@ -324,11 +416,14 @@ def _filter_candidates_for_scene(word, candidates, scene):
     """过滤不适合场景的候选词。返回过滤后的列表，若全被过滤则返回原列表。
 
     Always filters _AI_PATTERN_BLACKLIST (candidates that trigger detect_cn itself).
-    Additionally filters ACADEMIC_BLACKLIST_CANDIDATES when scene='academic'.
+    Additionally filters ACADEMIC_BLACKLIST_CANDIDATES when scene='academic',
+    or NOVEL_BLACKLIST_CANDIDATES when scene='novel'.
     """
     filtered = [c for c in candidates if c not in _AI_PATTERN_BLACKLIST]
     if scene == 'academic':
         filtered = [c for c in filtered if c not in ACADEMIC_BLACKLIST_CANDIDATES]
+    elif scene == 'novel':
+        filtered = [c for c in filtered if c not in NOVEL_BLACKLIST_CANDIDATES]
     return filtered if filtered else candidates
 
 
@@ -398,6 +493,8 @@ def expand_with_cilin(word, candidates, scene='general'):
             continue  # semantic/POS/register mismatch, curated
         if scene == 'academic' and c in ACADEMIC_BLACKLIST_CANDIDATES:
             continue
+        if scene == 'novel' and c in NOVEL_BLACKLIST_CANDIDATES:
+            continue
         filtered.append(c)
         existing.add(c)
     return list(candidates) + filtered
@@ -414,12 +511,19 @@ NOISE_EXPRESSIONS = {
                         '更确切地说', '往深了讲', '细想一下'],
     'uncertainty': ['大概', '差不多', '似乎', '或许', '多少有些',
                     '约莫', '估摸着', '八成'],
-    'transition_casual': ['话说回来', '反过来看', '换句话说', '说到这里',
+    # Cycle 77: dropped '换句话说' — it is in detect_cn's ai_high_freq_words
+    # pattern, so injecting it raises the AI score (self-defeating).
+    'transition_casual': ['话说回来', '反过来看', '说到这里',
                           '再往下想', '回过头看', '顺着这个思路'],
     'filler': ['当然了', '其实', '说到底', '怎么说呢', '不瞒你说',
                '你别说', '讲真', '这么说吧'],
-    'personal': ['我觉得', '在我看来', '依我之见', '以我的经验',
-                 '在我的理解里', '就我所知', '我个人倾向于'],
+    # Cycle 55: dropped 5 entries that appear 0 times in 2.5M chars of
+    # human Chinese (news + novel corpora) — '依我之见 / 以我的经验 /
+    # 在我的理解里 / 就我所知 / 我个人倾向于'. These read as AI-style
+    # stilted hedges in any register (academic / general / social), not
+    # just academic. '我觉得' and '在我看来' kept (105 + 4 hits in human
+    # corpus, idiomatic).
+    'personal': ['我觉得', '在我看来'],
 }
 
 # Academic-safe categories (no oral fillers or personal opinions)
@@ -428,9 +532,12 @@ NOISE_ACADEMIC_CATEGORIES = ['hedging', 'self_correction', 'uncertainty']
 NOISE_ACADEMIC_EXPRESSIONS = {
     'hedging': ['客观地说', '实事求是地讲', '平心而论', '公正地看'],
     'self_correction': ['准确地讲', '严格来说', '更确切地说', '往深了讲'],
-    'uncertainty': ['大致', '似乎', '或许', '多少', '在一定程度上'],
+    # Cycle 77: dropped '在一定程度上' from this academic uncertainty pool too
+    # (sister fix to cycle 76 in academic_cn). It is in detect_cn's hedging_
+    # language and ai_high_freq_words patterns; injecting it raises the AI
+    # score. Pool 5→4.
+    'uncertainty': ['大致', '似乎', '或许', '多少'],
 }
-
 
 def _load_bigram_freq():
     """Load bigram frequencies from the n-gram frequency table."""
@@ -543,16 +650,45 @@ def reduce_high_freq_bigrams(text, strength=0.3, scene='general'):
         # (avoid monotone repetition of single replacement)
         alt_candidates = [c for c, _ in ranked if c != primary] or [primary]
 
+        # Capture original text for next-char lookups (text mutates inside loop)
+        original_text = text
+        ranked_alts = [c for c, _ in ranked]
+
+        def _pick_safe(default, next_ch):
+            """Avoid alts whose last char equals next_ch (would double).
+            Falls back to default if no safe alt exists."""
+            if not next_ch or default[-1:] != next_ch:
+                return default
+            for cand in ranked_alts:
+                if cand and cand[-1] != next_ch:
+                    return cand
+            return default
+
         # Rebuild text by iterating occurrences back-to-front (avoid shifting positions)
         for k in reversed(range(len(occurrences))):
             pos = occurrences[k]
             if k not in to_replace:
                 continue
+            # Word-boundary doubling guard: check next char in source after the
+            # word being replaced. If alt ends with that char, swap to a
+            # non-doubling alt. Catches '能够以X' → '可以以X' / '系统的研究'
+            # → '架构的的' family of bugs without removing the entry entirely.
+            next_ch = original_text[pos + len(word):pos + len(word) + 1]
+            # Cycle 54: left-context cross-boundary guard. '解决' inside
+            # '了解决策' actually spans 了解|决策 (two distinct words);
+            # replacing 解决 with 攻克 corrupts to '了攻克策'. Skip when
+            # the word's leading char + prev char form a known 2-char word
+            # AND the word's trailing char + next char also form a 2-char
+            # word — that's the cross-boundary signature.
+            prev_ch = original_text[pos - 1:pos] if pos > 0 else ''
+            if word == '解决' and prev_ch == '了' and next_ch in '策心议定断':
+                continue
             # Pick primary for first replaced occurrence, alternate for others
             if k == min(to_replace):
-                replacement = primary
+                replacement = _pick_safe(primary, next_ch)
             else:
-                replacement = random.choice([primary] + alt_candidates)
+                pick = random.choice([primary] + alt_candidates)
+                replacement = _pick_safe(pick, next_ch)
             protected = _protect(replacement)
             text = text[:pos] + protected + text[pos + len(word):]
 
@@ -657,8 +793,11 @@ def randomize_sentence_lengths(text, aggressive=False, seed=None):
             )
             s_stripped = s.strip()
             s2_stripped = s2.strip()
-            if s_stripped in _reactions or s2_stripped in _reactions:
-                # Preserve reaction as standalone sentence
+            # Paragraph boundary: split by [。！？] preserves \n\n as leading
+            # whitespace on the next sentence. Merging would .lstrip() the
+            # \n\n away and collapse two paragraphs into one — discourse
+            # structure loss (Petalses issue #5).
+            if '\n' in s2 or s_stripped in _reactions or s2_stripped in _reactions:
                 pass
             elif cn_len + cn_len2 < 100:
                 merged = s.rstrip() + '，' + s2.lstrip()
@@ -714,6 +853,29 @@ def randomize_sentence_lengths(text, aggressive=False, seed=None):
 #  Strategy 3: Noise expression injection
 # ═══════════════════════════════════════════════════════════════════
 
+def _dialogue_density_local(text):
+    """Fraction of chars inside Chinese dialogue quotes. AI novels use a
+    mix of curly U+201C/D (“”), corner U+300C/D (「」), and ASCII pairs
+    (which some models output instead). Threshold 0.08 flags narrative."""
+    n = 0
+    for pat in (r'“[^“”]{3,}?”', r'「[^「」]{3,}?」'):
+        for m in re.findall(pat, text):
+            n += len(m)
+    # ASCII " pairs: split on ", odd-indexed segments are inside quotes
+    parts = text.split('"')
+    if len(parts) >= 3:
+        for i in range(1, len(parts), 2):
+            if len(parts[i]) >= 3:
+                n += len(parts[i])
+    return n / max(1, len(text))
+
+
+# Narrative-safe subset of NOISE_EXPRESSIONS categories. filler/personal/
+# transition_casual inject 1st-person author voice or oral fillers that
+# break 3rd-person fiction register.
+_NARRATIVE_SAFE_CATEGORIES = ['hedging', 'uncertainty', 'self_correction']
+
+
 def inject_noise_expressions(text, density=0.15, style='general'):
     """
     策略3: 在句子间或句中适当位置插入噪声表达。
@@ -726,6 +888,12 @@ def inject_noise_expressions(text, density=0.15, style='general'):
     else:
         categories = list(NOISE_EXPRESSIONS.keys())
         expressions = NOISE_EXPRESSIONS
+        # Narrative guard: if text is dialogue-heavy, drop categories that
+        # break 3rd-person voice (filler/personal/transition_casual).
+        if _dialogue_density_local(text) >= 0.08:
+            categories = [c for c in categories if c in _NARRATIVE_SAFE_CATEGORIES]
+            if not categories:
+                return text
 
     # Split into sentences
     parts = re.split(r'([。！？])', text)
@@ -741,6 +909,12 @@ def inject_noise_expressions(text, density=0.15, style='general'):
     if len(sentences) < 3:
         return text
 
+    # Track expressions already injected in this run. Re-injecting the same
+    # phrase ("\u5f80\u6df1\u4e86\u8bb2" / "\u5e73\u5fc3\u800c\u8bba") three times in one sample reads as a
+    # tic, which detect_cn flags as repetitive and a human reviewer flags as
+    # robot-style.
+    used = set()
+
     injected = 0
     for i in range(len(sentences)):
         # Skip the last sentence (avoid orphaned expressions)
@@ -750,6 +924,26 @@ def inject_noise_expressions(text, density=0.15, style='general'):
         s_text = sentences[i][0]
         if len(re.findall(r'[\u4e00-\u9fff]', s_text)) < 8:
             continue
+        # Skip sentences that contain dialogue quotes. Injecting a noise
+        # expression into a quoted line puts narrator filler inside a
+        # character's mouth \u2014 awkward and breaks dialogue flow.
+        if '"' in s_text or '\u201c' in s_text or '\u201d' in s_text or '\u300c' in s_text or '\u300d' in s_text:
+            continue
+        # Cycle 57/58: skip sentences that start with markdown structural
+        # markers (# heading / - * bullet / **bold** subheader / 1. 2.
+        # numbered list). Injecting '\u4e0d\u7792\u4f60\u8bf4\uff0c' before '#### 2.2 ...' or
+        # '\u5728\u6211\u770b\u6765\uff0c**3. \u54c1\u724c\u5efa\u8bbe\uff1a\u6587\u5316\u2026**' corrupts the structural marker.
+        # Cycle 58 widens the **-prefix check from "starts AND ends with **"
+        # (pure bold subheader) to just "starts with **" \u2014 covers hybrid
+        # forms like '**1. \u8d44\u6e90\u74f6\u9888\uff1a** \u9ad8\u5e76\u53d1\u610f\u5473\u7740\u2026' that the cycle 57
+        # check missed (audit found 34 longform samples with this pattern).
+        s_lstripped = s_text.lstrip()
+        if s_lstripped.startswith('#') or s_lstripped.startswith('- ') or s_lstripped.startswith('* '):
+            continue
+        if s_lstripped.startswith('**'):
+            continue
+        if re.match(r'^\d+[.\u3002\uff0e)\uff09]', s_lstripped):
+            continue
         if random.random() > density:
             continue
 
@@ -757,21 +951,33 @@ def inject_noise_expressions(text, density=0.15, style='general'):
         expr_list = expressions.get(cat, [])
         if not expr_list:
             continue
-        expr = random.choice(expr_list)
+        avail = [e for e in expr_list if e not in used]
+        if not avail:
+            avail = expr_list  # fallback when category exhausted
+        expr = random.choice(avail)
+        used.add(expr)
 
         s, p = sentences[i]
 
+        # Preserve leading whitespace (\n\n paragraph breaks) — sentences
+        # that start a new paragraph have \n\n at their head (artifact of
+        # the [。！？] split). .lstrip() would eat those and collapse
+        # paragraph structure.
+        leading_ws_len = len(s) - len(s.lstrip())
+        leading = s[:leading_ws_len]
+        s_body = s[leading_ws_len:]
+
         # Decide insertion position
         if cat in ('hedging', 'filler', 'personal', 'transition_casual'):
-            # Insert at sentence beginning
-            s = expr + '，' + s.lstrip()
+            # Insert at sentence beginning (after any paragraph break)
+            s = leading + expr + '，' + s_body
         elif cat in ('self_correction', 'uncertainty'):
             # Insert mid-sentence at a comma
-            comma_pos = s.find('，')
+            comma_pos = s_body.find('，')
             if comma_pos > 3:
-                s = s[:comma_pos + 1] + expr + '，' + s[comma_pos + 1:]
+                s = leading + s_body[:comma_pos + 1] + expr + '，' + s_body[comma_pos + 1:]
             else:
-                s = expr + '，' + s.lstrip()
+                s = leading + expr + '，' + s_body
 
         sentences[i] = [s, p]
         injected += 1
@@ -838,15 +1044,38 @@ def replace_phrases(text, casualness=0.3):
             alternatives = [alternatives]
         
         if phrase in text:
-            # Find the sentence containing this phrase for stats-optimized selection
-            # Use pick_best_replacement to choose the highest-perplexity candidate
-            replacement = pick_best_replacement(text, phrase, alternatives)
-            text = text.replace(phrase, replacement, 1)  # Replace first occurrence
-            # For subsequent occurrences, use different alternatives
+            # Filter out alternatives that contain the phrase as a substring —
+            # those cause infinite re-match loops (e.g. 相反 -> 相反地 reinserts
+            # 相反). Without this, slow-path bug: cycle 2 HC3 500 hang, cycle 13
+            # longform benchmark kill on samples 85/86/133/144 (all had 相反).
+            safe_alts = [alt for alt in alternatives if phrase not in alt]
+            if not safe_alts:
+                continue
+            # Dedupe replacement choices for this phrase. pick_best_replacement
+            # is deterministic on perplexity, so when the same phrase occurs
+            # multiple times in a long sample it gets rewritten to the same
+            # alternative every iteration ('可能引起' x4-5 in audit). Track
+            # which alts have been used and prefer unused ones; fall back to
+            # the full safe list once exhausted.
+            used = set()
+            replacement = pick_best_replacement(text, phrase, safe_alts)
+            text = text.replace(phrase, replacement, 1)
+            used.add(replacement)
             while phrase in text:
-                replacement = pick_best_replacement(text, phrase, alternatives)
+                avail = [a for a in safe_alts if a not in used]
+                if not avail:
+                    # Cycle exhausted — clear `used` so the next round
+                    # rotates through the alts again instead of falling
+                    # back to a single deterministic pick. Without this
+                    # reset, sample 38 of the longform corpus rewrites
+                    # 9 occurrences of '然后' as 6×'随后' + '接着' + '之后'
+                    # + '随后' instead of an even distribution.
+                    used.clear()
+                    avail = safe_alts
+                replacement = pick_best_replacement(text, phrase, avail)
                 text = text.replace(phrase, replacement, 1)
-    
+                used.add(replacement)
+
     return text
 
 def merge_short_sentences(text, min_len=8):
@@ -868,11 +1097,17 @@ def merge_short_sentences(text, min_len=8):
         next_sent = sentences[i + 2] if i + 2 < len(sentences) else ''
         
         if len(sent.strip()) < min_len and len(next_sent.strip()) < min_len and next_sent.strip():
-            # Merge with comma
-            merged = sent.strip() + '，' + next_sent.strip()
-            next_punct = sentences[i + 3] if i + 3 < len(sentences) else '。'
-            result.append(merged + next_punct)
-            i += 4
+            # Don't merge across paragraph boundaries — \n\n leading
+            # next_sent would be stripped by .strip(), collapsing paragraphs.
+            if '\n' in sent or '\n' in next_sent:
+                result.append(sent + punct)
+                i += 2
+            else:
+                # Merge with comma
+                merged = sent.strip() + '，' + next_sent.strip()
+                next_punct = sentences[i + 3] if i + 3 < len(sentences) else '。'
+                result.append(merged + next_punct)
+                i += 4
         else:
             result.append(sent + punct)
             i += 2
@@ -952,19 +1187,43 @@ def vary_paragraph_rhythm(text):
     paragraphs = text.split('\n\n')
     if len(paragraphs) < 3:
         return text
-    
+
     lengths = [len(p) for p in paragraphs]
     avg_len = sum(lengths) / len(lengths) if lengths else 100
-    
+
+    def _is_md_header(p):
+        # Markdown headers ('# ', '## ', '### ' …), bullets, bold section
+        # subheaders, numbered list items, and dialogue lines are
+        # deliberately short structural paragraphs; merging them collapses
+        # document structure (sample 63 of longform corpus: ## headers
+        # lost; cycle-44 audit: bold subheaders + numbered list items;
+        # cycle-46 audit: novel sample 1323 had two dialogue paragraphs
+        # like '"嗯，我很喜欢。"' merged into one block, losing the
+        # turn-by-turn formatting).
+        s = p.lstrip()
+        if s.startswith('#') or s.startswith('- ') or s.startswith('* '):
+            return True
+        if s.startswith('**') and s.rstrip().endswith('**'):
+            return True
+        if re.match(r'^\d+[.。．)）]', s):
+            return True
+        # Dialogue line (Chinese / Western quotes / Japanese 「」)
+        if s and s[0] in '"“「':
+            return True
+        return False
+
     result = []
     i = 0
     while i < len(paragraphs):
         para = paragraphs[i]
-        
-        # Randomly merge short adjacent paragraphs
+
+        # Randomly merge short adjacent paragraphs (skip markdown headers /
+        # bullet items — those are deliberately short structural markers).
         if (i + 1 < len(paragraphs) and
             len(para) < avg_len * 0.6 and
             len(paragraphs[i + 1]) < avg_len * 0.6 and
+            not _is_md_header(para) and
+            not _is_md_header(paragraphs[i + 1]) and
             random.random() < 0.4):
             merged = para + '\n' + paragraphs[i + 1]
             result.append(merged)
@@ -1009,6 +1268,43 @@ def reduce_punctuation(text):
     text = re.sub(r'——', '—', text)
     
     return text
+
+def cap_transition_density(text, target=6.0):
+    """Drop clause-initial transition phrases until density <= target.
+
+    Runs AFTER all other humanize passes. Keeps transitions that are
+    low-density already; removes excess probabilistically. Detect threshold
+    fires at density > 8 per 1000 chars, so target 6 gives margin.
+    """
+    try:
+        from ngram_model import _TRANSITION_PHRASES
+    except ImportError:
+        from scripts.ngram_model import _TRANSITION_PHRASES
+
+    cn_chars = sum(1 for c in text if '\u4e00' <= c <= '\u9fff')
+    if cn_chars < 100:
+        return text
+
+    hits = sum(text.count(p) for p in _TRANSITION_PHRASES)
+    density = hits / cn_chars * 1000
+    if density <= target:
+        return text
+
+    remove_prob = min(0.9, (density - target) / density)
+
+    for phrase in sorted(_TRANSITION_PHRASES, key=len, reverse=True):
+        esc = re.escape(phrase)
+        pattern = re.compile(r'(^|[。！？\n])(' + esc + r')([，,、])?')
+
+        def sub(m):
+            if random.random() < remove_prob:
+                return m.group(1)
+            return m.group(0)
+
+        text = pattern.sub(sub, text)
+
+    return text
+
 
 def inject_sentence_particles(text, rate=0.15):
     """Append casual sentence-ending particles (吧/嘛/呗) to random statements.
@@ -1104,16 +1400,18 @@ def diversify_vocabulary(text):
     diversity_map = {
         '进行': ['做', '开展', '实施', '推进'],
         '实现': ['达到', '做到', '完成'],
-        '提供': ['给出', '带来', '拿出'],
+        '提供': ['给出', '带来'],  # Cycle 63: dropped 拿出 (see WORD_SYNONYMS comment)
         '具有': ['有', '拥有', '带有'],
         '进一步': ['更', '再', '深入'],
         '不断': ['持续', '一直', '始终'],
-        '有效': ['管用', '见效', '奏效'],
+        # '有效' skipped: attributive/adj usage (有效证件) breaks with verb substitutes
         '积极': ['主动', '热心'],
         '促进': ['推动', '带动'],
         '加强': ['强化', '增强'],
         '提高': ['提升', '增加'],
-        '重要': ['关键', '核心'],
+        # '关键' alt removed: '至关重要' (4-char idiom) -> '至关关键' (doubled-关).
+        # Same idiom-substring boundary issue handled in WORD_SYNONYMS upstream.
+        '重要': ['核心'],
     }
     
     for word, alts in diversity_map.items():
@@ -1152,7 +1450,10 @@ def _estimate_source_aiscore(text):
         return None
 
 
-def humanize(text, scene='general', aggressive=False, seed=None):
+DEFAULT_BEST_OF_N = 10
+
+
+def humanize(text, scene='general', aggressive=False, seed=None, best_of_n=DEFAULT_BEST_OF_N, style=None):
     """Apply all humanization transformations in order.
 
     Graduated intensity based on source AI-score (pre-detect):
@@ -1161,10 +1462,32 @@ def humanize(text, scene='general', aggressive=False, seed=None):
       - score >= 40 (full): entire pipeline including noise injection
     Aggressive flag forces 'full' tier.
 
+    best_of_n: if set to an integer, runs humanize N times with different seeds
+    and returns the output that scores lowest on the LR ensemble (requires
+    scripts/lr_coef_cn.json). Useful when minimizing LR score matters more
+    than latency.
+
     Rationale: HC3 benchmark showed that full pipeline on already-clean text
     (source score < 15) adds spurious AI patterns (段落均匀/熵低) via noise
     injection, sometimes INCREASING detected score. Tiered intensity avoids this.
     """
+    if best_of_n and best_of_n > 1:
+        try:
+            from ngram_model import compute_lr_score
+        except ImportError:
+            from scripts.ngram_model import compute_lr_score
+        base_seed = seed if seed is not None else 42
+        candidates = []
+        for i in range(best_of_n):
+            s = base_seed + i
+            out = humanize(text, scene=scene, aggressive=aggressive,
+                           seed=s, best_of_n=None, style=style)
+            lr = compute_lr_score(out)
+            score = lr['score'] if lr else 50
+            candidates.append((score, s, out))
+        candidates.sort(key=lambda x: x[0])
+        return candidates[0][2]
+
     if seed is not None:
         random.seed(seed)
 
@@ -1228,15 +1551,62 @@ def humanize(text, scene='general', aggressive=False, seed=None):
         bigram_strength = 0.5 if aggressive else 0.3
         if tier == 'moderate':
             bigram_strength *= 0.6
-        text = reduce_high_freq_bigrams(text, strength=bigram_strength, scene=scene)
+        # Route bigram substitution through the novel-register filter when
+        # --style novel is active. NOVEL_BLACKLIST_CANDIDATES strips the
+        # overtly colloquial / book-Chinese substitutes ('搞'/'拉高'/'业已'/
+        # '早就') that break narrative register, while keeping
+        # ('察觉'/'识破') that academic mode rejects.
+        bigram_scene = 'novel' if style == 'novel' else scene
+        text = reduce_high_freq_bigrams(text, strength=bigram_strength, scene=bigram_scene)
 
     # Noise + sentence randomization only at full tier — these are the operations
     # that on HC3 sometimes added spurious AI patterns to already-clean text.
     if tier == 'full' and _USE_NOISE:
         noise_density = 0.25 if aggressive else 0.15
-        text = inject_noise_expressions(text, density=noise_density, style='general')
+        # Novel/fiction register: noise injection (regardless of expression
+        # subset) frequently lands on prepositional or vocative sentence heads
+        # ('作为...' / '人物名+verb') and reads as awkward. Lean on word
+        # substitutions + transition cap + paraphrase replacement for delta
+        # in novel mode instead.
+        if style != 'novel':
+            # Cycle 104: route academic scene through NOISE_ACADEMIC_EXPRESSIONS
+            # subset (hedging / self_correction / uncertainty). Cycle 54 tried
+            # this and lost -2 academic hero, but cycles 76-101 since cleaned
+            # the pool of self-defeating entries — second attempt with the
+            # tighter pool. Audit found 20+ filler / transition_casual /
+            # personal injections in academic samples ('不瞒你说' / '说到底' /
+            # '讲真' / '约莫' / '估摸着') that read off-register.
+            noise_style = 'academic' if scene == 'academic' else 'general'
+            text = inject_noise_expressions(text, density=noise_density, style=noise_style)
         text = randomize_sentence_lengths(text, aggressive=aggressive, seed=seed)
     
+    # Final transition cap — AI overuses 首先/然而/此外/因此 etc, detect fires
+    # density > 8/1000 chars. Cap at 6 to leave margin. Preserves text that's
+    # already under the threshold.
+    # Long-form (novel/blog) humans use far fewer transitions (d=0.92 gap vs
+    # AI). Drop cap target on long text so novel humanize approaches human 2.4
+    # density instead of staying at AI's 4.4 baseline.
+    cn_chars = sum(1 for c in text if '\u4e00' <= c <= '\u9fff')
+    trans_target = 3.0 if cn_chars >= 1500 else 6.0
+    text = cap_transition_density(text, target=trans_target)
+
+    # Novel/fiction register: strip overused AI-style intensifiers.
+    # Spot-check on 20 \u7384\u5e7b samples showed \u300c\u5341\u5206/\u975e\u5e38/\u6781\u5176/\u683c\u5916/\u6781\u4e3a/\u6781\u5ea6/
+    # \u5c24\u4e3a/\u9887\u4e3a\u300d+ adj appears ~25-28 times per 20-sample batch as an AI
+    # mannerism. Negative lookaheads exclude the two false positives we
+    # observed: '\u5341\u5206\u949f' (time noun) and '\u975e\u5e38\u89c4' (adv prefix).
+    # Skip '\u65e0\u6bd4' (\u53e5\u5c3e idiomatic, deletion would break clauses) and
+    # '\u76f8\u5f53' (quantifier, '\u76f8\u5f53\u591a/\u76f8\u5f53\u957f' \u2260 intensifier).
+    if style == 'novel':
+        text = re.sub(r'\u5341\u5206(?![\u949f\u4e4b])', '', text)
+        text = re.sub(r'\u975e\u5e38(?![\u89c4])', '', text)
+        text = re.sub(r'\u6781\u5176', '', text)
+        text = re.sub(r'\u683c\u5916', '', text)
+        text = re.sub(r'\u6781\u4e3a', '', text)
+        text = re.sub(r'\u6781\u5ea6', '', text)
+        text = re.sub(r'\u5c24\u4e3a', '', text)
+        text = re.sub(r'\u9887\u4e3a', '', text)
+
     # Clean up artifacts
     text = re.sub(r'[，,]{2,}', '，', text)  # Remove double commas
     text = re.sub(r'[。]{2,}', '。', text)    # Remove double periods
@@ -1302,6 +1672,8 @@ def main():
     parser.add_argument('--style', help='写作风格 (调用 style_cn.py)')
     parser.add_argument('-a', '--aggressive', action='store_true', help='激进模式')
     parser.add_argument('--seed', type=int, help='随机种子（可复现）')
+    parser.add_argument('--best-of-n', type=int, default=DEFAULT_BEST_OF_N, metavar='N',
+                        help=f'运行 N 次 humanize 取 LR 分数最低的那次（默认 {DEFAULT_BEST_OF_N}，N 倍延迟，0 关闭）')
     parser.add_argument('--no-stats', action='store_true',
                        help='跳过统计优化（困惑度反馈），回退到纯规则替换')
     parser.add_argument('--no-noise', action='store_true',
@@ -1341,7 +1713,8 @@ def main():
         sys.exit(1)
     
     # Humanize
-    result = humanize(text, args.scene, args.aggressive, args.seed)
+    result = humanize(text, args.scene, args.aggressive, args.seed,
+                       best_of_n=args.best_of_n)
     
     # Apply style if specified
     if args.style:

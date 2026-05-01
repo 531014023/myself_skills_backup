@@ -103,9 +103,35 @@ def load_hc3(path, n=50, source_filter=None, min_chars=100, seed=42):
     return samples
 
 
-def score_text(text):
+_LR_AVAILABLE = None
+
+def _have_lr():
+    global _LR_AVAILABLE
+    if _LR_AVAILABLE is None:
+        try:
+            from ngram_model import compute_lr_score
+            from ngram_model import _load_lr_coef
+            _LR_AVAILABLE = _load_lr_coef() is not None
+        except Exception:
+            _LR_AVAILABLE = False
+    return _LR_AVAILABLE
+
+
+def score_text(text, mode='fused'):
+    """Score text. mode in {'fused', 'lr', 'rule'}.
+    Fused = 0.2*rule + 0.8*LR (default)."""
     issues, metrics = detect_patterns(text)
-    return calculate_score(issues, metrics), issues, metrics
+    rule = calculate_score(issues, metrics)
+    if mode == 'rule' or not _have_lr():
+        return rule, issues, metrics
+    from ngram_model import compute_lr_score
+    lr_r = compute_lr_score(text)
+    if lr_r is None:
+        return rule, issues, metrics
+    if mode == 'lr':
+        return lr_r['score'], issues, metrics
+    # default: fused
+    return round(0.2 * rule + 0.8 * lr_r['score']), issues, metrics
 
 
 def count_paragraphs(text):
@@ -127,25 +153,62 @@ def find_repeat_clauses(text, min_len=10, max_check=50):
     return dupes
 
 
-def run_one(sample, mode='humanize'):
+# Grammar/register defects mirror the longform benchmark — these are bugs the
+# cycle 22-34 J-path sweep already eliminated; the metric guards against
+# regressions if a future change re-introduces any of them.
+_DEFECT_PATTERNS = (
+    (r'地地', 'doubled_di'),
+    (r'的的', 'doubled_de'),
+    (r'是是', 'doubled_shi'),
+    (r'的地', 'mixed_de_di'),
+    (r'可以地', 'awkward_keyi_di'),
+    (r'有办法地', 'awkward_youbanfa_di'),
+    (r'有效地能', 'inverted_youxiao_neng'),
+    (r'跟进着', 'invalid_genjin_zhe'),
+    (r'留着神', 'typo_liuzhe_shen'),
+    (r'在[一-鿿]{1,4}左右下', 'idiom_break_yingxiang_zuoyou'),
+    (r'案[察觉识看][觉破察出]场', 'idiom_break_anfa_xianchang'),
+    (r'阵地地位', 'template13_zhendi_diwei'),
+    (r'至关关键', 'idiom_break_zhiguan_zhongyao'),
+    (r'最最要紧', 'doubled_zui'),
+    (r'到到头来', 'doubled_dao'),
+    (r'在在', 'doubled_zai'),
+    (r'市场场景', 'doubled_chang'),
+    (r'可以以', 'doubled_yi'),
+)
+
+
+def _count_grammar_defects(humanized, source):
+    """Count humanize-introduced grammar defect patterns (vs source baseline)."""
+    total = 0
+    for pattern, _ in _DEFECT_PATTERNS:
+        n_in = len(re.findall(pattern, source))
+        n_out = len(re.findall(pattern, humanized))
+        if n_out > n_in:
+            total += (n_out - n_in)
+    return total
+
+
+def run_one(sample, mode='humanize', score_mode='fused'):
     """Run detect on both answers, humanize the ChatGPT answer, detect again.
 
     Returns dict of per-sample metrics.
     """
-    human_score, _, _ = score_text(sample['human_answer'])
-    chatgpt_score, _, _ = score_text(sample['chatgpt_answer'])
+    human_score, _, _ = score_text(sample['human_answer'], mode=score_mode)
+    chatgpt_score, _, _ = score_text(sample['chatgpt_answer'], mode=score_mode)
 
     original = sample['chatgpt_answer']
     if mode == 'academic':
         humanized = humanize_academic(original, aggressive=False, seed=42)
     else:
         humanized = humanize_general(original, scene='general', aggressive=False, seed=42)
-    humanized_score, _, _ = score_text(humanized)
+    humanized_score, _, _ = score_text(humanized, mode=score_mode)
 
     paragraphs_before = count_paragraphs(original)
     paragraphs_after = count_paragraphs(humanized)
     length_ratio = len(humanized) / len(original) if len(original) else 0
     duplicates = find_repeat_clauses(humanized)
+    grammar_defects = _count_grammar_defects(humanized, original)
 
     return {
         'source': sample['source'],
@@ -159,6 +222,7 @@ def run_one(sample, mode='humanize'):
         'length_ratio': length_ratio,
         'duplicate_count': len(duplicates),
         'duplicates': duplicates[:3],
+        'grammar_defects': grammar_defects,
     }
 
 
@@ -219,6 +283,15 @@ def summarize(results, mode):
                 sum(r['length_ratio'] for r in results) / n, 3
             ),
             'samples_with_duplicates': sum(1 for r in results if r['duplicate_count']),
+            # Hard-floor metric: humanize-introduced grammar defects (doubled
+            # chars / typos / idiom corruption / invalid transitions). Cycle
+            # 22-34 J-path sweep brought this to 0; metric guards regressions.
+            'grammar_defects_count': sum(
+                r.get('grammar_defects', 0) for r in results
+            ),
+            'grammar_defects_samples': sum(
+                1 for r in results if r.get('grammar_defects', 0) > 0
+            ),
         },
         'by_source': source_summary,
     }
@@ -246,6 +319,10 @@ def format_text_report(summary):
     lines.append(f'  段落保留率: {sh["paragraph_preserved_rate"] * 100:.1f}%')
     lines.append(f'  平均长度比 (改写后/原文): {sh["avg_length_ratio"]}')
     lines.append(f'  有重复子句的样本: {sh["samples_with_duplicates"]}')
+    gd_count = sh.get('grammar_defects_count', 0)
+    gd_samples = sh.get('grammar_defects_samples', 0)
+    lines.append(f'  grammar defects (humanize-introduced): {gd_count} 处 in {gd_samples} 样本'
+                 f' {"✓" if gd_count == 0 else "⚠"}')
     lines.append('')
     lines.append('── 按来源 ──')
     for src, info in summary['by_source'].items():
@@ -272,6 +349,8 @@ def main():
     parser.add_argument('--verbose', '-v', action='store_true',
                        help='每个样本逐条打印')
     parser.add_argument('--seed', type=int, default=42, help='随机种子')
+    parser.add_argument('--mode', default='fused', choices=['fused', 'lr', 'rule'],
+                        help='score mode (default: fused = 0.2*rule + 0.8*LR)')
     args = parser.parse_args()
 
     if args.cilin:
@@ -285,7 +364,7 @@ def main():
     mode = 'academic' if args.academic else 'humanize'
     results = []
     for i, sample in enumerate(samples):
-        r = run_one(sample, mode=mode)
+        r = run_one(sample, mode=mode, score_mode=args.mode)
         results.append(r)
         if args.verbose:
             print(f'[{i+1}/{len(samples)}] {r["source"]:12s} '

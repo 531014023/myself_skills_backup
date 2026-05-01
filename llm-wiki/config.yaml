@@ -1,9 +1,9 @@
 # LLM Wiki 多知识库配置
 # 使用 YAML 格式配置知识库列表
 
-default_knowledge_base: wiki
+default_knowledge_base: knowlage-wiki
 
 knowledge_bases:
-  - name: wiki
-    path: ~/wiki
+  - name: knowlage-wiki
+    path: ~/knowlage-wiki
     schema: CLAUDE.md

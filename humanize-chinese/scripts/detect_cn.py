@@ -712,8 +712,39 @@ def main():
     parser.add_argument('-s', '--score', action='store_true', help='仅输出分数')
     parser.add_argument('-v', '--verbose', action='store_true', help='详细模式（含逐句分析）')
     parser.add_argument('--sentences', type=int, default=5, help='显示最可疑的 N 个句子')
-    
-    args = parser.parse_args()
+    parser.add_argument('--lr', action='store_true',
+                        help='仅 LR ensemble 打分（诊断用）')
+    parser.add_argument('--rule-only', action='store_true',
+                        help='仅 rule+stat 打分（legacy 模式，忽略 LR 系数）')
+    parser.add_argument('--scene', default='general', choices=['general', 'academic', 'novel', 'auto'],
+                        help='LR 场景（academic 自动用 lr_coef_academic.json）')
+
+    # Catch the common UX confusion (issue #6): users see `-o output.txt
+    # --compare` documented for the rewriter and try them on the detector.
+    # Surface a friendly redirect instead of argparse's terse "unrecognized
+    # arguments".
+    args, unknown = parser.parse_known_args()
+    rewriter_flags = {'-o', '--output', '--compare', '-a', '--aggressive'}
+    misuse = [a for a in unknown if a in rewriter_flags]
+    if misuse:
+        print(
+            f'错误: detect_cn.py 不接受参数 {misuse}（这些是改写工具的参数）',
+            file=sys.stderr,
+        )
+        print('你似乎想运行改写工具。请改用：', file=sys.stderr)
+        print('  ./humanize academic <input> -o <output> --compare', file=sys.stderr)
+        print(
+            '  或 python3 scripts/academic_cn.py <input> -o <output> --compare',
+            file=sys.stderr,
+        )
+        print(
+            '\ndetect_cn.py 只做 AI 文本检测（不改写），常见用法：', file=sys.stderr
+        )
+        print('  python3 scripts/detect_cn.py <input>', file=sys.stderr)
+        print('  python3 scripts/detect_cn.py <input> --json', file=sys.stderr)
+        sys.exit(2)
+    if unknown:
+        parser.parse_args()  # let argparse handle the rest with its normal error
     
     # Read input
     if args.file:
@@ -732,7 +763,26 @@ def main():
     
     # Detect
     issues, metrics = detect_patterns(text)
-    score = calculate_score(issues, metrics)
+    rule_score = calculate_score(issues, metrics)
+
+    # Default mode: fused rule+LR (sway 2026-04-21 directive). Falls back to
+    # rule-only when LR coefs are missing, or when --rule-only is explicitly set.
+    # --lr gives the LR-only score for diagnostics.
+    try:
+        from ngram_model import compute_lr_score
+    except ImportError:
+        from scripts.ngram_model import compute_lr_score
+    lr_result = None if args.rule_only else compute_lr_score(text, scene=args.scene)
+
+    if args.rule_only or lr_result is None:
+        score = rule_score
+    else:
+        metrics['_lr'] = lr_result
+        if args.lr:
+            score = lr_result['score']
+        else:  # default: fused
+            score = round(0.2 * rule_score + 0.8 * lr_result['score'])
+            metrics['_fused'] = {'rule_stat': rule_score, 'lr': lr_result['score']}
     
     # Sentence analysis (verbose mode)
     worst_sentences = None

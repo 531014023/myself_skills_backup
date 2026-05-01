@@ -96,6 +96,29 @@ def _trigram_log_prob(c1, c2, c3, freq):
     return log2(p_interp) if p_interp > 0 else -20.0
 
 
+def compute_unigram_perplexity(text):
+    """Character unigram perplexity. AI Chinese tends to concentrate more on
+    common characters (lower uni ppl) than human writing.
+
+    Returns float or 0.0 if text too short.
+    """
+    freq = _load_freq()
+    chars = _extract_chinese(text)
+    if len(chars) < 5:
+        return 0.0
+    unigrams = freq['unigrams']
+    total = sum(unigrams.values()) or 1
+    V = max(len(unigrams), 1000)
+    k = 0.01
+    avg_lp = 0.0
+    for c in chars:
+        count = unigrams.get(c, 0)
+        prob = (count + k) / (total + k * V)
+        avg_lp += log2(prob) if prob > 0 else -20.0
+    avg_lp /= len(chars)
+    return 2 ** (-avg_lp)
+
+
 def compute_perplexity(text, window_size=0):
     """
     Compute character-level perplexity of Chinese text using interpolated trigram model.
@@ -469,6 +492,131 @@ def _load_human_freq():
         table = _HUMAN_FREQ_CACHE.get(key, {})
         _HUMAN_FREQ_CACHE[key] = {k: int(v) for k, v in table.items()}
     return _HUMAN_FREQ_CACHE
+
+
+_WIKI_FREQ_CACHE = None
+_WIKI_FREQ_FILE = os.path.join(SCRIPT_DIR, 'ngram_freq_cn_wiki.json')
+
+
+def _load_wiki_freq():
+    """Lazy-load Wikipedia ngram frequency table (F-3, 2026-04-22).
+    Returns None if file missing — graceful fallback when feature is disabled."""
+    global _WIKI_FREQ_CACHE
+    if _WIKI_FREQ_CACHE is not None:
+        return _WIKI_FREQ_CACHE
+    if not os.path.exists(_WIKI_FREQ_FILE):
+        _WIKI_FREQ_CACHE = None
+        return None
+    with open(_WIKI_FREQ_FILE, 'r', encoding='utf-8') as f:
+        _WIKI_FREQ_CACHE = json.load(f)
+    for key in ('unigrams', 'bigrams', 'trigrams'):
+        table = _WIKI_FREQ_CACHE.get(key, {})
+        _WIKI_FREQ_CACHE[key] = {k: int(v) for k, v in table.items()}
+    return _WIKI_FREQ_CACHE
+
+
+_NEWS_FREQ_CACHE = None
+_NEWS_FREQ_FILE = os.path.join(SCRIPT_DIR, 'ngram_freq_cn_news.json')
+
+
+def _load_news_freq():
+    """Lazy-load news ngram (THUCNews-derived). Returns None if missing."""
+    global _NEWS_FREQ_CACHE
+    if _NEWS_FREQ_CACHE is not None:
+        return _NEWS_FREQ_CACHE
+    if not os.path.exists(_NEWS_FREQ_FILE):
+        _NEWS_FREQ_CACHE = None
+        return None
+    with open(_NEWS_FREQ_FILE, 'r', encoding='utf-8') as f:
+        _NEWS_FREQ_CACHE = json.load(f)
+    for key in ('unigrams', 'bigrams', 'trigrams'):
+        table = _NEWS_FREQ_CACHE.get(key, {})
+        _NEWS_FREQ_CACHE[key] = {k: int(v) for k, v in table.items()}
+    return _NEWS_FREQ_CACHE
+
+
+def compute_news_lp_diff(text):
+    """News-vs-{human, wiki} log-prob divergences.
+
+    HC3 300+300 Cohen's d on expanded 10-category news corpus:
+    news_vs_human=1.20, news_vs_wiki=0.27. AI text is much closer
+    to news register than casual human Q&A answers are.
+    """
+    news = _load_news_freq()
+    human = _load_human_freq()
+    wiki = _load_wiki_freq()
+    if news is None or human is None or wiki is None:
+        return {'available': False, 'news_vs_human': 0.0, 'news_vs_wiki': 0.0}
+
+    chars = _extract_chinese(text)
+    if len(chars) < 30:
+        return {'available': True, 'news_vs_human': 0.0, 'news_vs_wiki': 0.0}
+
+    n_sum = h_sum = w_sum = 0.0
+    n = 0
+    for i in range(2, len(chars)):
+        n_sum += _trigram_log_prob(chars[i-2], chars[i-1], chars[i], news)
+        h_sum += _trigram_log_prob(chars[i-2], chars[i-1], chars[i], human)
+        w_sum += _trigram_log_prob(chars[i-2], chars[i-1], chars[i], wiki)
+        n += 1
+    if n == 0:
+        return {'available': True, 'news_vs_human': 0.0, 'news_vs_wiki': 0.0}
+    n_avg = n_sum / n
+    h_avg = h_sum / n
+    w_avg = w_sum / n
+    return {
+        'available': True,
+        'news_vs_human': n_avg - h_avg,
+        'news_vs_wiki': n_avg - w_avg,
+    }
+
+
+def compute_wiki_lp_diff(text):
+    """Compute Wikipedia-corpus log-prob divergences for Binoculars-style signal.
+
+    Returns:
+      wiki_vs_human: mean(lp_wiki) - mean(lp_human)
+      wiki_vs_primary: mean(lp_primary) - mean(lp_wiki)
+
+    HC3 300+300 pilot Cohen's d:
+      wiki_vs_human  = 1.58 (strongest seen)
+      wiki_vs_primary = 1.13
+
+    Interpretation: AI text sits closer to encyclopedic Wikipedia distribution
+    than casual human Q&A does, providing an orthogonal signal to bino_lp_diff.
+    """
+    wiki_freq = _load_wiki_freq()
+    human_freq = _load_human_freq()
+    primary_freq = _load_freq()
+    if wiki_freq is None or human_freq is None:
+        return {'available': False, 'char_count': 0,
+                'wiki_vs_human': 0.0, 'wiki_vs_primary': 0.0}
+
+    chars = _extract_chinese(text)
+    if len(chars) < 30:
+        return {'available': True, 'char_count': len(chars),
+                'wiki_vs_human': 0.0, 'wiki_vs_primary': 0.0}
+
+    p_sum = w_sum = h_sum = 0.0
+    n = 0
+    for i in range(2, len(chars)):
+        p_sum += _trigram_log_prob(chars[i-2], chars[i-1], chars[i], primary_freq)
+        w_sum += _trigram_log_prob(chars[i-2], chars[i-1], chars[i], wiki_freq)
+        h_sum += _trigram_log_prob(chars[i-2], chars[i-1], chars[i], human_freq)
+        n += 1
+    if n == 0:
+        return {'available': True, 'char_count': len(chars),
+                'wiki_vs_human': 0.0, 'wiki_vs_primary': 0.0}
+
+    p_avg = p_sum / n
+    w_avg = w_sum / n
+    h_avg = h_sum / n
+    return {
+        'available': True,
+        'char_count': len(chars),
+        'wiki_vs_human': w_avg - h_avg,
+        'wiki_vs_primary': p_avg - w_avg,
+    }
 
 
 def compute_binoculars_ratio(text):
@@ -883,8 +1031,20 @@ def analyze_text(text):
     # Binoculars dual ngram ratio (B-path cycle 23, gated on secondary ngram file)
     bino = compute_binoculars_ratio(text)
 
+    # Wikipedia ngram divergence (F-3 2026-04-22, gated on wiki ngram file)
+    wiki = compute_wiki_lp_diff(text)
+
+    # News ngram divergence (F-11 2026-04-22, THUCNews-derived)
+    news = compute_news_lp_diff(text)
+
     # Char-level MATTR (E-8, arxiv 2507.15092 PATTR-lite)
     char_mattr = compute_char_mattr(text, window=100)
+
+    # F-path multi-scale: unigram ppl and its ratio to trigram ppl.
+    # HC3 pilot: uni_ppl alone d=0.08, uni/tri_ratio d=0.31 (AI concentrates
+    # common chars differently from humans, most visible in the ratio).
+    uni_ppl = compute_unigram_perplexity(text)
+    uni_tri_ratio = uni_ppl / ppl_result['perplexity'] if ppl_result.get('perplexity', 0) > 0 else 0.0
 
     # Thresholds — conservative, designed for character-level n-gram model.
     #
@@ -1000,7 +1160,11 @@ def analyze_text(text):
         'trans': trans,
         'curv': curv,
         'bino': bino,
+        'wiki': wiki,
+        'news': news,
         'char_mattr': char_mattr,
+        'uni_ppl': uni_ppl,
+        'uni_tri_ratio': uni_tri_ratio,
         'indicators': indicators,
         'details': {
             'perplexity_result': {
@@ -1021,6 +1185,182 @@ def analyze_text(text):
             },
         },
     }
+
+
+# ─── LR ensemble feature extraction (F-path F-2) ───
+
+LR_FEATURE_NAMES = (
+    'perplexity',
+    'burstiness',
+    'entropy_cv',
+    'diveye_skew',
+    'diveye_excess_kurt',
+    'diveye_spectral_flatness',
+    'diveye_autocorr_lag1',
+    'gltr_top10_frac',
+    'gltr_top100_frac',
+    'sent_len_cv',
+    'sent_len_short_frac',
+    'sent_len_long_frac',
+    'sent_len_equal_mid_frac',
+    'punct_comma_density',
+    'punct_density',
+    'trans_density',
+    'curv_mean',
+    'bino_lp_diff',
+    'uni_tri_ratio',        # F-2 multi-scale ratio, HC3 d=0.31
+    'wiki_vs_human',        # F-3 2026-04-22, HC3 d=1.58
+    'wiki_vs_primary',      # F-3 2026-04-22, HC3 d=1.13
+    'news_vs_human',        # F-11 2026-04-22, HC3 d=1.20 (on 10-category news corpus)
+)
+
+
+_LR_COEF_CACHE = {}
+_LR_COEF_FILE = os.path.join(SCRIPT_DIR, 'lr_coef_cn.json')
+_LR_COEF_ACADEMIC_FILE = os.path.join(SCRIPT_DIR, 'lr_coef_academic.json')
+_LR_COEF_LONGFORM_FILE = os.path.join(SCRIPT_DIR, 'lr_coef_longform.json')
+
+
+def _load_lr_coef(path=None, scene='general'):
+    """Load LR coefficients + scaler stats from JSON. Cached per file.
+
+    scene: 'general' -> lr_coef_cn.json; 'academic' -> lr_coef_academic.json;
+    'novel' / 'longform' -> lr_coef_longform.json (trained on AI long-form
+    + human novel/news corpora). Falls back to general if the scene file
+    is absent.
+    """
+    if path is None:
+        if scene == 'academic' and os.path.exists(_LR_COEF_ACADEMIC_FILE):
+            path = _LR_COEF_ACADEMIC_FILE
+        elif scene in ('novel', 'longform') and os.path.exists(_LR_COEF_LONGFORM_FILE):
+            path = _LR_COEF_LONGFORM_FILE
+        else:
+            path = _LR_COEF_FILE
+    if path in _LR_COEF_CACHE:
+        return _LR_COEF_CACHE[path]
+    if not os.path.exists(path):
+        _LR_COEF_CACHE[path] = None
+        return None
+    import json
+    with open(path, encoding='utf-8') as f:
+        data = json.load(f)
+    data['_path'] = path
+    _LR_COEF_CACHE[path] = data
+    return data
+
+
+def _auto_scene(text_or_analysis, short_thresh=1500):
+    """Choose scene by text length. Long text (>= 1500 Chinese chars)
+    routes to the long-form LR; shorter text stays on general. Academic
+    is never auto-selected — users must opt in explicitly."""
+    if isinstance(text_or_analysis, str):
+        cn = sum(1 for c in text_or_analysis if '\u4e00' <= c <= '\u9fff')
+    else:
+        cn = text_or_analysis.get('char_count', 0)
+    return 'novel' if cn >= short_thresh else 'general'
+
+
+def compute_lr_score(text_or_analysis, coef_path=None, scene='general'):
+    """Score text via LR ensemble. Returns dict with p_ai, score_0_100,
+    and feature contributions.
+
+    scene: 'general' (default) uses lr_coef_cn.json; 'academic' uses
+    lr_coef_academic.json; 'novel'/'longform' uses lr_coef_longform.json;
+    'auto' routes to novel for long text (>= 1500 Chinese chars) and
+    general otherwise. Explicit coef_path overrides scene.
+    Returns None if the requested coef file is absent.
+    """
+    if scene == 'auto':
+        scene = _auto_scene(text_or_analysis)
+    coef = _load_lr_coef(coef_path, scene=scene)
+    if coef is None:
+        return None
+
+    vec, names = extract_feature_vector(text_or_analysis)
+    means = coef['mean']
+    scales = coef['scale']
+    weights = coef['coef']
+    intercept = coef['intercept']
+
+    # Standardize then compute logit. Slice to len(weights) so older coef files
+    # (trained with fewer features) remain compatible with newer feature vectors.
+    n = min(len(weights), len(vec))
+    standardized = [(vec[i] - means[i]) / (scales[i] if scales[i] else 1.0)
+                    for i in range(n)]
+    logit = intercept + sum(standardized[i] * weights[i] for i in range(n))
+    import math as _m
+    # Clamp to avoid overflow
+    if logit > 500:
+        p_ai = 1.0
+    elif logit < -500:
+        p_ai = 0.0
+    else:
+        p_ai = 1.0 / (1.0 + _m.exp(-logit))
+    score = round(100 * p_ai)
+
+    contribs = [(names[i], standardized[i] * weights[i]) for i in range(n)]
+    contribs.sort(key=lambda x: -abs(x[1]))
+
+    return {
+        'p_ai': p_ai,
+        'score': score,
+        'logit': logit,
+        'top_contributions': contribs[:5],
+        'features': dict(zip(names, vec)),
+    }
+
+
+def extract_feature_vector(text_or_analysis):
+    """Flatten analyze_text output into a fixed-length 18-feature vector for LR.
+
+    Accepts either raw text (re-runs analyze_text) or a pre-computed analysis
+    dict (saves one full pass when upstream already has it).
+
+    Returns (vector, names) where vector is list of 18 floats in LR_FEATURE_NAMES
+    order. All features are continuous; missing/unavailable features default to
+    0.0 (e.g., Binoculars returns 0 when secondary ngram file absent).
+    """
+    if isinstance(text_or_analysis, str):
+        analysis = analyze_text(text_or_analysis)
+    else:
+        analysis = text_or_analysis
+
+    diveye = analysis.get('diveye', {}) or {}
+    gltr = analysis.get('gltr', {}) or {}
+    gltr_props = gltr.get('proportions', {}) if gltr else {}
+    sent_len = analysis.get('sent_len', {}) or {}
+    punct = analysis.get('punct', {}) or {}
+    trans = analysis.get('trans', {}) or {}
+    curv = analysis.get('curv', {}) or {}
+    bino = analysis.get('bino', {}) or {}
+    wiki = analysis.get('wiki', {}) or {}
+    news = analysis.get('news', {}) or {}
+
+    vec = [
+        float(analysis.get('perplexity') or 0.0),
+        float(analysis.get('burstiness') or 0.0),
+        float(analysis.get('entropy_cv') or 0.0),
+        float(diveye.get('skew') or 0.0),
+        float(diveye.get('excess_kurt') or 0.0),
+        float(diveye.get('spectral_flatness') or 0.0),
+        float(diveye.get('autocorr_lag1') or 0.0),
+        float(gltr_props.get('top10') or 0.0),
+        float(gltr_props.get('top100') or 0.0),  # mid-rank analog
+        float(sent_len.get('cv') or 0.0),
+        float(sent_len.get('short_frac') or 0.0),
+        float(sent_len.get('long_frac') or 0.0),
+        float(sent_len.get('equal_mid_frac') or 0.0),
+        float(punct.get('comma_density') or 0.0),
+        float(punct.get('punct_density') or 0.0),
+        float(trans.get('density') or 0.0),
+        float(curv.get('curvature_mean') or 0.0),
+        float(bino.get('mean_lp_diff') or 0.0),
+        float(analysis.get('uni_tri_ratio') or 0.0),
+        float(wiki.get('wiki_vs_human') or 0.0),
+        float(wiki.get('wiki_vs_primary') or 0.0),
+        float(news.get('news_vs_human') or 0.0),
+    ]
+    return vec, list(LR_FEATURE_NAMES)
 
 
 # ─── CLI ───

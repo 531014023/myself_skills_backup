@@ -602,7 +602,7 @@ if not ACADEMIC_REPLACEMENTS:
         '被认为是': ['一般视为', '通常归入', '多看作'],
         '被视为': ['常被看作', '往往归类为'],
         '被看作': ['通常被理解为', '多半被归为'],
-        '被称为': ['学界习惯称之为', '一般称其为'],
+        '被称为': ['通称作', '俗称', '一般叫作', '被叫作'],
         '被普遍认为': ['多数学者倾向于认为', '主流观点认为'],
         '被证明': ['经验证', '已有证据支持'],
         '被证实': ['得到了实证支持', '验证结果支持'],
@@ -740,7 +740,12 @@ except ImportError:
 _USE_NOISE = True
 
 HEDGING_INJECTIONS = [
-    '在一定程度上', '从某种角度看', '初步来看', '大体上',
+    # Cycle 76: dropped '在一定程度上' — it is in detect_cn's hedging_language
+    # detection AND the high-signal ai_high_freq_words pattern, so injecting
+    # it as a humanize hedge actually raises the AI score (self-defeating).
+    # The remaining entries are kept for diversity even though most are
+    # zero-freq in human corpus; they still vary the surface form.
+    '从某种角度看', '初步来看', '大体上',
     '就目前而言', '在多数情况下', '就现有研究来看',
     '从目前的情况看', '在一定条件下', '大致可以认为',
 ]
@@ -849,6 +854,34 @@ def _add_author_voice(text, aggressive=False):
     return text
 
 
+_NUMBERED_LIST_RE = re.compile(r'^\d+[.。．)）]')
+
+
+def _is_md_header(p):
+    """Markdown headers / list bullets / bold subheaders / numbered list
+    items / dialogue lines are deliberately short structural paragraphs
+    (## 引言 / ### 故事梗概 / - **bullet**: ... / **2.1 X** /
+    1. **政策支持**：... / "..."). Merging them into adjacent body
+    paragraphs collapses document structure (cycle 44 audit:
+    humanize_academic dropped 11/40 longform academic+news samples'
+    paragraph counts; cycle-46 audit: novel dialogue exchanges merged
+    into one block losing turn-by-turn formatting). Same guard family
+    as cycle-43 fix in humanize_cn.vary_paragraph_rhythm."""
+    s = p.lstrip()
+    if s.startswith('#') or s.startswith('- ') or s.startswith('* '):
+        return True
+    # Pure bold-marker subheading: '**...**' that is most of the paragraph.
+    if s.startswith('**') and s.rstrip().endswith('**'):
+        return True
+    # Numbered list item ('1.', '2)', '3。', '4．' etc.).
+    if _NUMBERED_LIST_RE.match(s):
+        return True
+    # Dialogue line (Chinese / Western quotes / Japanese 「」)
+    if s and s[0] in '"“「':
+        return True
+    return False
+
+
 def _break_uniform_structure(text):
     """Vary paragraph structure to break AI-like uniformity.
     Preserves paragraph breaks (\n\n)."""
@@ -865,11 +898,15 @@ def _break_uniform_structure(text):
             i += 1
             continue
 
-        # Occasionally merge two short adjacent paragraphs
+        # Occasionally merge two short adjacent paragraphs (skip markdown
+        # headers and bullet items — those are structural markers, not body
+        # text that wants combining).
         if (i + 1 < len(paragraphs) and
                 count_chinese(para) < 60 and
                 count_chinese(paragraphs[i + 1]) < 60 and
                 paragraphs[i + 1].strip() and
+                not _is_md_header(para) and
+                not _is_md_header(paragraphs[i + 1]) and
                 random.random() < 0.25):
             merged = para.rstrip() + '\n' + paragraphs[i + 1].lstrip()
             result.append(merged)
@@ -995,8 +1032,34 @@ def _add_limitation_markers(text, aggressive=False):
     return text
 
 
-def humanize_academic(text, aggressive=False, seed=None):
-    """Apply all academic humanization transforms."""
+DEFAULT_BEST_OF_N = 10
+
+
+def humanize_academic(text, aggressive=False, seed=None, best_of_n=DEFAULT_BEST_OF_N):
+    """Apply all academic humanization transforms.
+
+    best_of_n: if set to an integer, runs humanize_academic N times with
+    different seeds and returns the output that scores lowest on the LR
+    ensemble (requires scripts/lr_coef_cn.json). Higher N is slower; useful
+    when caller wants minimum LR score and is willing to pay the latency.
+    """
+    if best_of_n and best_of_n > 1:
+        try:
+            from ngram_model import compute_lr_score
+        except ImportError:
+            from scripts.ngram_model import compute_lr_score
+        base_seed = seed if seed is not None else 42
+        candidates = []
+        for i in range(best_of_n):
+            s = base_seed + i
+            out = humanize_academic(text, aggressive=aggressive, seed=s,
+                                    best_of_n=None)
+            lr = compute_lr_score(out, scene='academic')
+            score = lr['score'] if lr else 50
+            candidates.append((score, s, out))
+        candidates.sort(key=lambda x: x[0])
+        return candidates[0][2]
+
     if seed is not None:
         random.seed(seed)
 
@@ -1320,6 +1383,8 @@ def main():
     parser.add_argument('-s', '--score', action='store_true', help='仅输出分数')
     parser.add_argument('-v', '--verbose', action='store_true', help='详细模式')
     parser.add_argument('--seed', type=int, help='随机种子（可复现）')
+    parser.add_argument('--best-of-n', type=int, default=DEFAULT_BEST_OF_N, metavar='N',
+                        help=f'运行 N 次 humanize 取 LR 分数最低的那次（默认 {DEFAULT_BEST_OF_N}，N 倍延迟，0 关闭）')
     parser.add_argument('--no-stats', action='store_true',
                        help='跳过统计优化（困惑度反馈），回退到纯规则替换')
     parser.add_argument('--no-noise', action='store_true',
@@ -1365,7 +1430,8 @@ def main():
         return
 
     # Humanize
-    humanized = humanize_academic(text, aggressive=args.aggressive, seed=args.seed)
+    humanized = humanize_academic(text, aggressive=args.aggressive, seed=args.seed,
+                                   best_of_n=args.best_of_n)
 
     if args.compare:
         # Run both academic and general detection on humanized text

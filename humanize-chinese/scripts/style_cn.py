@@ -54,6 +54,10 @@ STYLES = {
         'name': '微博风格',
         'description': '简短、有态度、适合传播',
     },
+    'novel': {
+        'name': '小说风格',
+        'description': '长篇叙事，保段落结构，去 AI 腔但不加口语化元素',
+    },
 }
 
 # ─── 通用工具 ───
@@ -487,6 +491,88 @@ def transform_literary(text):
     
     return ''.join(result)
 
+# Regex markers for AI novel prompt-leakage. Mined from
+# ai_longform_corpus.jsonl: models write meta-commentary before the
+# actual story ("好的，我将按照您的要求创作..." / "故事梗概" / "本次写作").
+_NOVEL_ARTIFACT_PATTERNS = (
+    r'我将按照您的',
+    r'按照您的要求',
+    r'根据您(供给|提供)的',
+    r'以下是我(根据|为您|按照)',
+    r'故事梗概',
+    r'本次写作(重点|将|主要)',
+    r'接下来故事(可能|将|会)',
+    r'这是一个关于.{0,20}的故事',
+)
+
+# Markdown structural markers that AI novels use for section headers
+# (### 故事梗概 / #### 正文 etc.). Safe to strip whole paragraphs.
+_NOVEL_MARKDOWN_HEADER = re.compile(r'^\s*#{1,4}\s+')
+
+# Bullet-list opener used in AI synopsis scaffolding.
+# Example: "- **秘境探险**：筑基期修士..."
+_NOVEL_BULLET_OPENER = re.compile(r'^\s*[-\*]\s+\*\*[^\*]+\*\*[:：]')
+
+# Markdown horizontal rule as a standalone paragraph.
+_NOVEL_HRULE = re.compile(r'^\s*(?:---+|\*\*\*+|===+)\s*$')
+
+
+def transform_novel(text):
+    """长篇小说风格：去 AI 味但不加口语/emoji/hashtag。
+
+    核心动作：
+      1. 剔除 AI novel prompt artifacts (模型写小说前的元说明段)
+      2. 剔除 markdown 结构头 (### 故事梗概 / #### 正文)
+      3. 段落级处理，不破 \\n\\n
+      4. 不用 remove_formal_structure（首先/其次 在小说里很少见，若有
+         多半是人物对白，强删会伤叙事）
+      5. 不加感官描写（literary 风的东西），叙事应由作者定
+    """
+    artifact_pats = [re.compile(p) for p in _NOVEL_ARTIFACT_PATTERNS]
+
+    def _has_artifact(p_head):
+        return any(pat.search(p_head) for pat in artifact_pats)
+
+    paragraphs = text.split('\n\n')
+    cleaned = []
+    for p in paragraphs:
+        stripped = p.strip()
+        if not stripped:
+            continue
+
+        # Strip markdown section headers — drop line, keep remaining body
+        if _NOVEL_MARKDOWN_HEADER.match(stripped):
+            lines = stripped.split('\n', 1)
+            if len(lines) == 1:
+                continue  # entire paragraph was just the header
+            stripped = lines[1].strip()
+            if not stripped:
+                continue
+
+        # Drop horizontal rule paragraphs (--- / *** / ===) — AI adds
+        # these as section dividers in synopsis scaffolding.
+        if _NOVEL_HRULE.match(stripped):
+            continue
+
+        # Drop synopsis bullet paragraphs like "- **秘境探险**：筑基期修士..."
+        # These are AI's pre-writing outline, not story body. Story
+        # paragraphs don't open with "- **X**：" pattern.
+        if _NOVEL_BULLET_OPENER.match(stripped):
+            continue
+
+        # Drop paragraphs that look like AI meta-commentary —
+        # head contains artifact pattern AND paragraph is short (<300).
+        # Long paragraphs with artifact mention are likely body text
+        # referencing it rhetorically, keep those.
+        head = stripped[:60]
+        if _has_artifact(head) and len(stripped) < 300:
+            continue
+
+        cleaned.append(stripped)
+
+    return '\n\n'.join(cleaned)
+
+
 def transform_weibo(text):
     """微博风格"""
     text = remove_formal_structure(text)
@@ -535,6 +621,7 @@ TRANSFORM_MAP = {
     'academic': transform_academic,
     'literary': transform_literary,
     'weibo': transform_weibo,
+    'novel': transform_novel,
 }
 
 _STYLE_TO_SCENE = {
@@ -545,6 +632,7 @@ _STYLE_TO_SCENE = {
     'academic':    'formal',
     'literary':    'general',
     'weibo':       'social',
+    'novel':       'general',
 }
 
 
@@ -561,7 +649,9 @@ def apply_style(text, style_name, humanize_first=True, seed=None):
 
     if humanize_first and _humanize_text is not None:
         scene = _STYLE_TO_SCENE.get(style_name, 'general')
-        text = _humanize_text(text, scene=scene, aggressive=False, seed=seed)
+        humanize_style = 'novel' if style_name == 'novel' else None
+        text = _humanize_text(text, scene=scene, aggressive=False, seed=seed,
+                              style=humanize_style)
 
     transform_fn = TRANSFORM_MAP.get(style_name)
     if transform_fn:
