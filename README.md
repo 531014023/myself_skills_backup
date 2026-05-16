@@ -1,6 +1,6 @@
 # Claude Skills 技能库
 
-> 本目录包含 55 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
+> 本目录包含 57 个 Claude Code 技能（Skills），覆盖投资研究、文档处理、思维框架、信息搜索、创意设计、开发工具等多个领域。
 
 ---
 
@@ -19,14 +19,16 @@
 | [value-investment-debate](./value-investment-debate) | 价值投资辩论 | 多角色（巴菲特+芒格+唐朝等）多角度辩论分析投资标的。数据优先，多轮交锋，评分总结 |
 | [personal-writing-style](./personal-writing-style) | 投资写作风格 | 第一人称叙事、结构化逻辑分析、数据驱动、直接坦率的语言表达和深度反思思维模式 |
 
-### 二、股票研究工具（3个）
+### 二、股票研究工具（6个）
 
 | Skill | 名称 | 描述 |
 |-------|------|------|
 | [stock-research-engine](./stock-research-engine) | 个股研究引擎 | 买方基金经理视角的个股深度研究。覆盖A股/港股/美股，输出投资分析简报（含市场情绪、基本面、管理层、估值等） |
 | [cninfo-annual-download](./cninfo-annual-download) | 年报下载器 | 巨潮资讯网年报下载器。支持A股（沪/深/北交所）和港股的年报、半年报、季报等定期报告下载 |
 | [annual-report-extractor](./annual-report-extractor) | 年报数据提取 | 从年报PDF中提取数值型财务数据和产能数据。支持任意字段自动适配，输出CSV格式 |
-| [cai-bao-pai-lei-v2](./cai-bao-pai-lei-v2) | 财报排雷v2 | 基于唐朝《手把手教你读财报》方法论的财报排雷分析。支持A股/港股/美股，38条疑点规则库，强制六步疑点排查流程 |
+| [财报排雷v2](./财报排雷v2) | 财报排雷v2 | 基于唐朝《手把手教你读财报》和《价值投资实战手册》方法论的企业财报排雷分析。支持A股/港股/美股，38条疑点规则库，强制六步排查流程 |
+| [hongli-dividend-selector](./hongli-dividend-selector) | 红利选股器 | 银月红利精选指数选股系统。四层筛选漏斗（一票否决→量化门槛→行业约束→综合评分），从全市场筛选高股息低负债行业龙头 |
+| [落云轩企业深度分析](./落云轩企业深度分析) | 落云轩企业深度分析 | 融合唐朝、彼得·林奇、波特五力、晨星护城河、杜邦分析、费雪十五点，对公司进行深度定性分析 |
 
 ### 三、文档处理（8个）
 
@@ -65,11 +67,11 @@
 | [devil-advocate](./devil-advocate) | 魔鬼代言人 | 自我反驳式思考，输出前先进行正反辩论，提升输出质量 |
 | [doc-coauthoring](./doc-coauthoring) | 文档协作 | 结构化文档协作工作流，帮助用户高效转移上下文、迭代优化内容 |
 
-### 六、知识管理与创意工具（11个）
+### 六、知识管理与创意工具（13个）
 
 | Skill | 名称 | 描述 |
 |-------|------|------|
-| [ima-skill](./ima-skill) | IMA笔记 | 统一的IMA OpenAPI技能，支持笔记管理和知识库操作。上传文件、添加网页、搜索知识库、笔记CRUD |
+| [腾讯ima](./腾讯ima) | 腾讯ima | 统一的IMA OpenAPI技能，支持笔记管理和知识库操作。上传文件、添加网页、搜索知识库、笔记CRUD |
 | [obsidian](./obsidian) | Obsidian操作 | 通过obsidian-cli操作Obsidian vaults。搜索笔记、创建笔记、移动/重命名、删除 |
 | [humanize-chinese](./humanize-chinese) | 去AI味 | 检测和改写中文AI生成文本。20+检测维度、7种风格转换、学术论文AIGC降重 |
 | [skill-creator](./skill-creator) | 技能创建指南 | 创建有效Skills的指南。包含目录结构、最佳实践、脚本/references/assets组织方式 |
@@ -107,7 +109,7 @@
 
 **投资研究**：想分析某只股票？→ [stock-research-engine](./stock-research-engine) + [value-investment-debate](./value-investment-debate)
 
-**年报数据**：需要下载和提取年报数据？→ [cninfo-annual-download](./cninfo-annual-download) + [annual-report-extractor](./annual-report-extractor)
+**年报数据与排雷**：需要下载年报、排查财务风险？→ [cninfo-annual-download](./cninfo-annual-download) + [annual-report-extractor](./annual-report-extractor) + [财报排雷v2](./财报排雷v2)
 
 **思维框架**：需要从伟人视角分析问题？→ [buffett-perspective](./buffett-perspective) / [munger-perspective](./munger-perspective) / [tang-chao-perspective](./tang-chao-perspective) / [feynman-perspective](./feynman-perspective)
 
@@ -115,10 +117,12 @@
 
 **信息搜索**：需要搜索和抓取网络内容？→ [多引擎搜索](./多引擎搜索) / [smart-web-fetch](./smart-web-fetch) / [hotlist-fetcher](./hotlist-fetcher)
 
+**选股与深度分析**：需要选红利股或深度分析企业？→ [hongli-dividend-selector](./hongli-dividend-selector) + [落云轩企业深度分析](./落云轩企业深度分析)
+
 **创建新技能**：需要构建新的人物思维框架？→ [huashu-nuwa](./huashu-nuwa)
 
 **Web开发**：需要构建前端界面或测试Web应用？→ [frontend-design](./frontend-design) / [webapp-testing](./webapp-testing) / [mcp-builder](./mcp-builder)
 
 ---
 
-*最后更新：2026-04-29*
+*最后更新：2026-05-16*

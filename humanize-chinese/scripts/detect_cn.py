@@ -22,6 +22,11 @@ except ImportError:
     except ImportError:
         ngram_analyze = None
 
+try:
+    from _text_utils import split_paragraphs
+except ImportError:
+    from scripts._text_utils import split_paragraphs
+
 # Load patterns from JSON config
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PATTERNS_FILE = os.path.join(SCRIPT_DIR, 'patterns_cn.json')
@@ -273,7 +278,7 @@ def detect_patterns(text):
         })
     
     # ── Style: Uniform paragraph lengths ──
-    paragraphs = [p.strip() for p in text.split('\n\n') if p.strip() and len(p.strip()) > 20]
+    paragraphs = [p.strip() for p in split_paragraphs(text) if p.strip() and len(p.strip()) > 20]
     if len(paragraphs) >= 3:
         lengths = [len(p) for p in paragraphs]
         avg_len = sum(lengths) / len(lengths)
@@ -309,12 +314,23 @@ def detect_patterns(text):
             })
     
     # ── Style: Repetitive sentence starters ──
+    # Cycle 184: skip markdown structural lines (## headers / - * bullets /
+    # 1. numbered) — they're SUPPOSED to share prefix, false-positive on
+    # academic / structured documents.
     if len(sentences) > 5:
         starters = defaultdict(int)
         for s in sentences:
             s = s.strip()
-            if len(s) >= 2:
-                starters[s[:2]] += 1
+            if len(s) < 2:
+                continue
+            # Skip markdown structural starts
+            if s.startswith('#') or s.startswith('- ') or s.startswith('* '):
+                continue
+            if s.startswith('**'):
+                continue
+            if re.match(r'^\d+[.。．)）]', s):
+                continue
+            starters[s[:2]] += 1
         max_repeat = max(starters.values()) if starters else 0
         if max_repeat >= 3:
             top_starter = max(starters, key=starters.get)
@@ -438,6 +454,18 @@ def detect_patterns(text):
                 'text': f'字符多样性 MATTR {mattr:.3f}（< 0.65，窗内用字过于集中）',
                 'severity': 'statistical',
             })
+
+        # Per-paragraph sentence-length CV (v5 P1 cycle 131,
+        # longform calibration 2026-04-29 d=-2.08)
+        if indicators.get('low_para_sent_len_cv'):
+            pscv = ngram_stats.get('para_slcv', {})
+            issues['stat_low_para_sent_len_cv'].append({
+                'text': (
+                    f'段内句长 CV 均值 {pscv.get("mean_cv", 0):.2f}'
+                    f'（< 0.35，每段内句子长度都过均匀，AI 长文本特征）'
+                ),
+                'severity': 'statistical',
+            })
     
     # ── Compute metrics ──
     metrics = {
@@ -490,6 +518,7 @@ STATISTICAL_WEIGHTS = {
     'stat_low_surprisal_kurt': 6,
     'stat_low_burstiness': 3,
     'stat_uniform_entropy': 2,
+    'stat_low_para_sent_len_cv': 10,          # v5 P1 2026-04-29, longform d=-2.08 (multi-paragraph only)
 }
 
 def calculate_score(issues, metrics):
@@ -625,6 +654,7 @@ CATEGORY_NAMES = {
     'stat_high_curvature': ('📊', '局部曲率高'),
     'stat_low_binoculars_diff': ('📊', '双ngram对齐度高'),
     'stat_low_char_mattr': ('📊', '字符多样性偏低'),
+    'stat_low_para_sent_len_cv': ('📊', '段内句长均匀'),
 }
 
 def format_output(issues, metrics, score, sentences=None, as_json=False, score_only=False, verbose=False):

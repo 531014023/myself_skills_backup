@@ -24,6 +24,11 @@ except ImportError:
     except ImportError:
         ngram_analyze = None
 
+try:
+    from _text_utils import join_paragraphs, split_paragraphs
+except ImportError:
+    from scripts._text_utils import join_paragraphs, split_paragraphs
+
 # Import general detector so --compare can show both academic and general AIGC scores.
 # Users comparing to CNKI/VIP-style detectors care about the general score, not the
 # academic-specific weighted one.
@@ -221,7 +226,7 @@ def topic_diffusion(text):
 
     Returns tuple (diffusion_score, n_paragraphs_used).
     """
-    paragraphs = [p.strip() for p in text.split('\n') if p.strip() and len(p.strip()) > 20]
+    paragraphs = [p.strip() for p in split_paragraphs(text) if p.strip() and len(p.strip()) > 20]
     if len(paragraphs) < 2:
         return 1.0, len(paragraphs)
 
@@ -295,7 +300,7 @@ def detect_academic(text):
     issues = defaultdict(list)
     char_count = count_chinese(text)
     sentences = split_sentences(text)
-    paragraphs = [p.strip() for p in text.split('\n') if p.strip() and len(p.strip()) > 10]
+    paragraphs = [p.strip() for p in split_paragraphs(text) if p.strip() and len(p.strip()) > 10]
 
     # ── 1. AI 典型学术措辞 ──
     for phrase in AI_ACADEMIC_PHRASES:
@@ -787,7 +792,7 @@ def _replace_academic_phrases(text, aggressive=False):
 def _inject_hedging(text, aggressive=False):
     """Add academic hedging language to overly certain statements.
     Processes paragraph by paragraph to preserve paragraph breaks."""
-    paragraphs = text.split('\n\n')
+    paragraphs = split_paragraphs(text)
     result_paragraphs = []
     injected = 0
     total_sents = len(split_sentences(text))
@@ -826,7 +831,7 @@ def _inject_hedging(text, aggressive=False):
 
         result_paragraphs.append(''.join(result))
 
-    return '\n\n'.join(result_paragraphs)
+    return join_paragraphs(result_paragraphs)
 
 
 def _add_author_voice(text, aggressive=False):
@@ -885,9 +890,25 @@ def _is_md_header(p):
 def _break_uniform_structure(text):
     """Vary paragraph structure to break AI-like uniformity.
     Preserves paragraph breaks (\n\n)."""
-    paragraphs = text.split('\n\n')
+    paragraphs = split_paragraphs(text)
     if len(paragraphs) < 3:
         return text
+
+    # cycle 170 guard (sister of humanize_cn.vary_paragraph_rhythm
+    # cycle 143 fix): if paragraph-length CV is already >= 0.40 (close
+    # to the human-text mean of 0.74), skip merge. Operating on
+    # already-varied paragraphs tends to push the distribution back
+    # toward uniform — a stuck academic sample regressed CV from 0.405
+    # to 0.320 across the full pipeline before that guard.
+    cn_lens = [count_chinese(p) for p in paragraphs]
+    valid_lens = [l for l in cn_lens if l >= 20]
+    if len(valid_lens) >= 3:
+        m_cn = sum(valid_lens) / len(valid_lens)
+        if m_cn > 0:
+            var = sum((l - m_cn) ** 2 for l in valid_lens) / len(valid_lens)
+            cv = (var ** 0.5) / m_cn
+            if cv >= 0.40:
+                return text
 
     result = []
     i = 0
@@ -923,7 +944,7 @@ def _break_uniform_structure(text):
         result.append(''.join(sentences))
         i += 1
 
-    return '\n\n'.join(result)
+    return join_paragraphs(result)
 
 
 def _reduce_connectors(text, aggressive=False):
@@ -1185,13 +1206,13 @@ def humanize_academic(text, aggressive=False, seed=None, best_of_n=DEFAULT_BEST_
                             break
                 return ''.join(sentences)
 
-            paragraphs = text.split('\n\n')
+            paragraphs = split_paragraphs(text)
             seed_base = seed + 1 if seed is not None else None
             fixed = [
                 _fix_paragraph(p, seed_base + i if seed_base is not None else None)
                 for i, p in enumerate(paragraphs)
             ]
-            text = '\n\n'.join(fixed)
+            text = join_paragraphs(fixed)
 
     return text.strip()
 

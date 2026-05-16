@@ -5,8 +5,9 @@ Usage:
   humanize detect   <file> [options]    AI detection score (0-100)
   humanize rewrite  <file> [options]    Humanize (去 AI 味改写)
   humanize academic <file> [options]    Academic paper AIGC 降重
-  humanize style    <file> --style S    7 种写作风格转换
+  humanize style    <file> --style S    8 种写作风格转换
   humanize compare  <file> [options]    改写前后对比
+  humanize doctor                       Check local data asset status
 
   humanize --list                       List available subcommands
   humanize <sub> --help                 Per-subcommand help (forwards to underlying script)
@@ -29,8 +30,9 @@ SUBCOMMANDS = {
     'detect':   ('detect_cn.py',   'AI 痕迹检测 (0-100)'),
     'rewrite':  ('humanize_cn.py', '通用去 AI 味改写'),
     'academic': ('academic_cn.py', '学术论文 AIGC 降重（11 维度）'),
-    'style':    ('style_cn.py',    '7 种风格转换（小红书/知乎/微博等）'),
+    'style':    ('style_cn.py',    '8 种风格转换（含小说/小红书/知乎/微博等）'),
     'compare':  ('compare_cn.py',  '改写前后对比'),
+    'doctor':   ('check_assets.py', '本地数据资产状态检查'),
 }
 
 ALIASES = {
@@ -51,8 +53,9 @@ Subcommands:
   detect     AI 痕迹检测 (0-100)
   rewrite    通用去 AI 味改写
   academic   学术论文 AIGC 降重（11 维度）
-  style      7 种风格转换（小红书/知乎/微博等）
+  style      8 种风格转换（含小说/小红书/知乎/微博等）
   compare    改写前后对比
+  doctor     本地数据资产状态检查
 
 Examples:
   humanize detect 论文.txt
@@ -60,6 +63,7 @@ Examples:
   humanize academic 论文.txt -o 改后.txt --compare
   humanize style text.txt --style xiaohongshu -o xhs.txt
   humanize compare text.txt -a
+  humanize doctor
 
 Per-subcommand help:
   humanize detect --help
