@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(npm update *)",
+      "Bash(claude *)",
+      "Bash(npm view *)",
+      "Bash(npm config *)",
+      "Bash(npm install *)"
     ]
   }
 }

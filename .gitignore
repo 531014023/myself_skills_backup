@@ -1,2 +1,4 @@
 config.local
 config.yaml
+__pycache__/
+downloads/
